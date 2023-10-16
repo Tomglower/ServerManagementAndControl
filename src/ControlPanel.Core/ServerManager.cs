@@ -2,6 +2,7 @@
 using ControlPanel.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using ControlPanel.Core.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ControlPanel.Core
 {
@@ -22,27 +23,38 @@ namespace ControlPanel.Core
                     return false;
                 }
 
-                var metricsUrl = $"http://{serverData.link}:9100/metrics";
-                var httpClient = new HttpClient();
-                var metricsResponse = await httpClient.GetAsync(metricsUrl);
+                var checkResult = await CheckMachine(serverData.link);
 
-                if (metricsResponse.IsSuccessStatusCode)
+                if (checkResult.Exists)
                 {
-                    var metricsData = await metricsResponse.Content.ReadAsStringAsync();
-                    serverData.Data = metricsData;
+                    Console.WriteLine(checkResult.Message);
+                    return false;
                 }
+
+                //var metricsUrl = $"http://{serverData.link}:9100/metrics";
+                //var httpClient = new HttpClient();
+                //var metricsResponse = await httpClient.GetAsync(metricsUrl);
+
+                //if (metricsResponse.IsSuccessStatusCode)
+                //{
+                //    var metricsData = await metricsResponse.Content.ReadAsStringAsync();
+                //    serverData.Data = metricsData;
+                //}
 
                 await _authContext.Machines.AddAsync(serverData);
                 await _authContext.SaveChangesAsync();
+
                 return true;
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine($"Произошла ошибка при добавлении сервера: {ex.Message}");
                 return false;
             }
         }
+
+
+
 
         public async Task<bool> CheckMachinelExist(string Link)
         {
@@ -90,6 +102,44 @@ namespace ControlPanel.Core
         }
 
 
+        public async Task<CheckMachineResult> CheckMachine(string link)
+        {
+            var result = new CheckMachineResult();
+
+            var existingMachine = await _authContext.Machines.FirstOrDefaultAsync(m => m.link == link);
+
+            if (existingMachine != null)
+            {
+                result.Exists = true;
+                result.Message = "Сервер с таким адресом уже существует.";
+            }
+            else
+            {
+                result.Exists = false;
+                result.Message = "Сервер с таким адресом не существует и будет добавлен.";
+            }
+
+            return result;
+        }
+        public async Task<DeleteMachineResult> DeleteMachine(int id)
+        {
+            var result = new DeleteMachineResult();
+            var deletingMachine = await _authContext.Machines.FirstOrDefaultAsync(i => i.id == id); 
+            if(deletingMachine != null) 
+            {
+                _authContext.Machines.Remove(deletingMachine);
+                await _authContext.SaveChangesAsync();
+                result.Exists = true;
+                result.Message = "Сервер удален";
+            }
+            else
+            {
+                result.Exists = false;
+                result.Message = "Данной машины не существует";
+            }
+            return result;
+        }
+        
 
     }
 }

@@ -20,6 +20,13 @@ export class DashboardService {
     })
    
   }
+  Check(machObj: any) {
+    return this.http.post<any>(`${this.baseUrl}CheckMachine`, machObj, {
+      headers: {
+        'Authorization': `Bearer ${this.auth.getToken()}`
+      }
+    })
+  }
 
   GetMachineList(machObj:any){
     return this.http.post<any>(`${this.baseUrl}GetServers`, machObj, {
@@ -29,7 +36,13 @@ export class DashboardService {
     })
     
   }
-
+  DeleteMachine(machObj: any) {
+    return this.http.post<any>(`${this.baseUrl}DeleteMachine`, machObj, {
+      headers: {
+        'Authorization': `Bearer ${this.auth.getToken()}`
+      }
+    })
+  }
   getMetrics(machineLink: string, query: string): Observable<any> {
     const body = {
       link: machineLink,

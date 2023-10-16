@@ -7,6 +7,7 @@ import {FormBuilder,FormGroup,Validators,FormControl} from '@angular/forms'
 import { Route, Router } from '@angular/router';
 import ValidateForm from 'src/app/helpers/validateForm';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { interval, throttle } from 'rxjs';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -23,6 +24,7 @@ ngOnInit():void{
     username:['',Validators.required],
     password:['',Validators.required]
   })
+  //this.loginForm.controls['asd'].valueChanges.pipe(throttle( ()=> interval(1000)) ).subscribe() //валидация id 
 }
 
 
@@ -36,7 +38,6 @@ onLogin(){
         alert(res.message)
         this.loginForm.reset();
         this.auth.storeToken(res.token)
-        
         this.router.navigate(['dashboard'])
       },
       error:(err)=>{

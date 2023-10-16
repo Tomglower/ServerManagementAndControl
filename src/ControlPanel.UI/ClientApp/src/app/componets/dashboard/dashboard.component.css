@@ -29,3 +29,9 @@
   margin-top: 20px;
 }
 
+.menu-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}

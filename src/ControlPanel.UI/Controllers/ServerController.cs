@@ -34,7 +34,7 @@ namespace ControlPanel.UI.Controllers
                 return BadRequest(new { Message = "Server already exist" });
             }
             var result = await _serverManager.AddServer(data);
-            if(result)
+            if (result)
             {
                 return Ok(new { Message = "Server Added!" });
             }
@@ -44,14 +44,14 @@ namespace ControlPanel.UI.Controllers
             }
         }
 
-        
+
         [HttpGet]
         [Authorize]
         [Route("GetServers")]
         public async Task<IActionResult> GetAllServers()
         {
             var machines = await _serverManager.GetServers();
-            return Ok(machines); 
+            return Ok(machines);
         }
 
         [HttpPost]
@@ -63,7 +63,7 @@ namespace ControlPanel.UI.Controllers
 
             if (result.Success)
             {
-                return Ok(new {data = result.Data });
+                return Ok(new { data = result.Data });
             }
             else
             {
@@ -71,7 +71,46 @@ namespace ControlPanel.UI.Controllers
             }
         }
 
-        
+        [HttpPost]
+        [Authorize]
+        [Route("CheckMachine")]
+        public async Task<IActionResult> CheckMachine([FromBody] CheckMachineRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Link))
+            {
+                return BadRequest(new { Message = "Invalid Link" });
+            }
+
+            var checkResult = await _serverManager.CheckMachine(request.Link);
+
+            if (checkResult.Exists)
+            {
+                return Ok(new { Message = checkResult.Message });
+            }
+            else
+            {
+                return Ok(new { Message = checkResult.Message });
+            }
+        }
+        [HttpPost]
+        [Authorize]
+        [Route("DeleteMachine")]
+        public async Task<IActionResult> DeleteMachine(DeleteMachineRequest req)
+        {
+           var deleteMachine = await _serverManager.DeleteMachine(req.id);
+            if(deleteMachine.Exists)
+            {
+                return Ok(new { Message = "Машина удалена" });
+            }
+            else
+            {
+                return BadRequest(new { Message = "Ошибка" });
+            }
+        }
+
+
+
+
     }
 
 }

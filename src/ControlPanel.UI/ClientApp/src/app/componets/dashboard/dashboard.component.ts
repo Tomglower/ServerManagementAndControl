@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
 import { NotificationService } from 'src/app/services/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
@@ -7,6 +7,11 @@ import Machine from 'src/app/helpers/Machine';
 import { GetMetricsService } from 'src/app/services/GetMetrics/get-metrics.service';
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import ValidateForm from 'src/app/helpers/validateForm';
+
+
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -15,7 +20,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 export class DashboardComponent {
   dashboardForm!: FormGroup;
-  inputValue: string = '';
+  Link: string = '';
   metricsData: any;
   machines: Machine[] = [];
   selectedMachine: Machine | null = null;
@@ -33,22 +38,21 @@ export class DashboardComponent {
     setInterval(() => {
       this.updateMachineData();
     }, 5000);
-
+    this.dashboardForm = this.fb.group({
+      Link: ['', Validators.required],
+    })
   }
   logout()
   {
     this.auth.signOut();
   }
   onButtonClick(): void {
-    if (this.inputValue.trim() === '') {
-      alert('Enter the machine adress');
+    if (this.dashboardForm.invalid) {
+      alert('Enter the machine address');
       return;
     }
 
-    const machineData = {
-      link: this.inputValue,
-    };
-    this.dashboardService.Add(machineData).subscribe(
+    this.dashboardService.Add(this.dashboardForm.value).subscribe(
       (response: any) => {
         alert(response.message);
       },
@@ -85,7 +89,7 @@ export class DashboardComponent {
   }
 
   updateMachineData() {
-    console.log('Updating machine data:', this.selectedMachine);
+
     if (this.selectedMachine) {
       this.http
         .post(
@@ -109,7 +113,19 @@ export class DashboardComponent {
         );
     }
   }
-
+  deleteMachine(machine: Machine) {
+    if (this.selectedMachine == machine) {
+      console.log(this.selectedMachine.id)
+      this.dashboardService.DeleteMachine(this.selectedMachine.id).subscribe(
+        (response: any) => {
+          alert(response.message);
+        },
+        (err: any) => {
+          alert(err.error.message);
+        }
+      );
+    }
+  }
   getMetr(query: string) {
     if (!this.selectedMachine) {
       return of(0); 
