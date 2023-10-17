@@ -57,7 +57,7 @@ namespace ControlPanel.UI.Controllers
             var result = await _serverManager.AddServer(new ServerData
             {
                 link = request.Link
-            }, request.UserId);; // Передайте userId как второй аргумент
+            }, request.UserId);; 
 
             if (result)
             {
