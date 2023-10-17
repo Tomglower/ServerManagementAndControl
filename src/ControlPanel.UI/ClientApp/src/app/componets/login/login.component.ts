@@ -25,7 +25,6 @@ ngOnInit():void{
     username:['',Validators.required],
     password:['',Validators.required]
   })
-  //this.loginForm.controls['asd'].valueChanges.pipe(throttle( ()=> interval(1000)) ).subscribe() //валидация id 
 }
 
   OpenSnackBar(message: string, action: string) {
@@ -39,7 +38,6 @@ ngOnInit():void{
 onLogin(){
   if(this.loginForm.valid)
   {
-    console.log(this.loginForm.value)
     this.auth.login(this.loginForm.value).subscribe({
       next:(res)=>{
         this.OpenSnackBar(res.message,'Close')
@@ -47,7 +45,6 @@ onLogin(){
         this.auth.storeToken(res.token)
         this.auth.storeId(res.id)
         this.router.navigate(['dashboard'])
-        console.log(res)
       },
       error:(err)=>{
         this.OpenSnackBar(err.error.message,'Close')
@@ -56,8 +53,6 @@ onLogin(){
     
 
   }else{
-
-
      ValidateForm.validateAllFormFields(this.loginForm)
     this.OpenSnackBar("Form is invalid",'Close')
 

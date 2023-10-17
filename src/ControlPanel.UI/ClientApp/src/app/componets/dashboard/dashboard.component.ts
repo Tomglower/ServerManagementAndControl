@@ -5,7 +5,7 @@ import { NotificationService } from 'src/app/services/notification/notification.
 import { HttpClient } from '@angular/common/http';
 import Machine from 'src/app/helpers/Machine';
 import { GetMetricsService } from 'src/app/services/GetMetrics/get-metrics.service';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, debounceTime, forkJoin, interval, map, of, throttle } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import ValidateForm from 'src/app/helpers/validateForm';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -45,9 +45,24 @@ export class DashboardComponent {
     this.dashboardForm = this.fb.group({
       Link: ['', Validators.required],
     })
+    this.dashboardForm.controls['Link'].valueChanges
+      .pipe(
+        debounceTime(1000), 
+        throttle(() => interval(1000)) 
+      )
+      .subscribe(
+        (value: any) => {
+          const request = { Link: value };
+          this.dashboardService.Check(request).subscribe(
+            (response: any) => {
+              this.OpenSnackBar(response.message, 'Close');
+            }
+            
+          );
+        }
+      );
   }
-  logout()
-  {
+  logout() {
     this.auth.signOut();
   }
   onButtonClick(): void {
@@ -58,7 +73,8 @@ export class DashboardComponent {
 
     this.dashboardService.Add(this.dashboardForm.value).subscribe(
       (response: any) => {
-        this.OpenSnackBar(response.message,'Close');
+        this.OpenSnackBar(response.message, 'Close');
+        this.loadMachines()
       },
       (err: any) => {
         this.OpenSnackBar(err.error.message,'Close');
@@ -76,7 +92,6 @@ export class DashboardComponent {
 
   loadMachines() {
     const userId = localStorage.getItem('UserId');
-    console.log(userId);
 
     const requestObject = { UserId: userId };
 
@@ -132,14 +147,16 @@ export class DashboardComponent {
     }
   }
   deleteMachine(machine: Machine) {
+    
     if (this.selectedMachine == machine) {
-      console.log(this.selectedMachine.id)
-      this.dashboardService.DeleteMachine(this.selectedMachine.id).subscribe(
+      const request = { id: this.selectedMachine.id };
+      this.dashboardService.DeleteMachine(request).subscribe(
         (response: any) => {
-          this.OpenSnackBar(response.message,'Close');
+          this.OpenSnackBar(response.Message, 'Close');
+          this.loadMachines()
         },
         (err: any) => {
-          this.OpenSnackBar(err.error.message,'Close');
+          this.OpenSnackBar(err.error.Message,'Close');
         }
       );
     }

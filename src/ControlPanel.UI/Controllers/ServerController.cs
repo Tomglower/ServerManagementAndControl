@@ -117,7 +117,7 @@ namespace ControlPanel.UI.Controllers
 
             if (checkResult.Exists)
             {
-                return Ok(new { Message = checkResult.Message });
+                return Ok(new { Message = checkResult.Message  });
             }
             else
             {
@@ -129,14 +129,21 @@ namespace ControlPanel.UI.Controllers
         [Route("DeleteMachine")]
         public async Task<IActionResult> DeleteMachine(DeleteMachineRequest req)
         {
-           var deleteMachine = await _serverManager.DeleteMachine(req.id);
-            if(deleteMachine.Exists)
+            try
             {
-                return Ok(new { Message = "Машина удалена" });
+                var deleteMachine = await _serverManager.DeleteMachine(req.id);
+                if (deleteMachine.Exists)
+                {
+                    return Ok(new { Message = deleteMachine.Message });
+                }
+                else
+                {
+                    return BadRequest(new { Message = deleteMachine.Message });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = "Ошибка" });
+                return BadRequest(new { Message = "Ошибка: " + ex.Message });
             }
         }
 

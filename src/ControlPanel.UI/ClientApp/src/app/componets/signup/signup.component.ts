@@ -43,7 +43,6 @@ onSignUp(){
         this.OpenSnackBar(err?.error.message,'Close')
       })
     })
-    console.log(this.signUpForm.value)
   }else{
     ValidateForm.validateAllFormFields(this.signUpForm)
   }

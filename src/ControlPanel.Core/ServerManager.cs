@@ -109,7 +109,7 @@ namespace ControlPanel.Core
             else
             {
                 result.Exists = false;
-                result.Message = "Сервер с таким адресом не существует и будет добавлен.";
+                result.Message = "Сервер с таким адресом не существует ";
             }
 
             return result;

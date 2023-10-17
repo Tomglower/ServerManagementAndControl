@@ -24,9 +24,9 @@
           <mat-list>
             <mat-list-item *ngFor="let machine of machines" (click)="showMachineDetails(machine)" [ngClass]="{'selected-list-item': machine === selectedMachine}" class="border">
               <a (click)="$event.stopPropagation()">{{ machine.link }}</a>
-              <button mat-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="menu"class="menu-button"><mat-icon>more_vert</mat-icon> </button>
+              <button mat-button [matMenuTriggerFor]="menu" class="menu-button"><mat-icon>more_vert</mat-icon></button>
               <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="deleteMachine(machine)">Удалить</button>
+                <button mat-menu-item (click)="deleteMachine(machine); $event.stopPropagation()">Удалить</button>
               </mat-menu>
             </mat-list-item>
           </mat-list>
