@@ -8,6 +8,7 @@ import { Route, Router } from '@angular/router';
 import ValidateForm from 'src/app/helpers/validateForm';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { interval, throttle } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -17,7 +18,7 @@ export class LoginComponent {
 
   loginForm!: FormGroup
   hide = true;
-constructor(private fb: FormBuilder,private auth:AuthService,private router:Router){}
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private snackBar: MatSnackBar){}
 
 ngOnInit():void{
   this.loginForm = this.fb.group({
@@ -27,7 +28,13 @@ ngOnInit():void{
   //this.loginForm.controls['asd'].valueChanges.pipe(throttle( ()=> interval(1000)) ).subscribe() //валидация id 
 }
 
-
+  OpenSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 3000,
+      verticalPosition: "top",
+      horizontalPosition: "center"
+    });
+  }
 
 onLogin(){
   if(this.loginForm.valid)
@@ -35,13 +42,13 @@ onLogin(){
     console.log(this.loginForm.value)
     this.auth.login(this.loginForm.value).subscribe({
       next:(res)=>{
-        alert(res.message)
+        this.OpenSnackBar(res.message,'Close')
         this.loginForm.reset();
         this.auth.storeToken(res.token)
         this.router.navigate(['dashboard'])
       },
       error:(err)=>{
-        alert(err.error.message)
+        this.OpenSnackBar(err.error.message,'Close')
       }
     })
     
@@ -50,7 +57,7 @@ onLogin(){
 
 
      ValidateForm.validateAllFormFields(this.loginForm)
-    alert("Form is invalid")
+    this.OpenSnackBar("Form is invalid",'Close')
 
   }
 }

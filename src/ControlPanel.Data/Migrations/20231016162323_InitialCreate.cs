@@ -5,34 +5,24 @@
 namespace ControlPanel.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ChangeModels2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "Id",
-                table: "Users",
-                newName: "id");
-
-            migrationBuilder.RenameColumn(
-                name: "Id",
+                name: "Link",
                 table: "Machines",
-                newName: "id");
+                newName: "link");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
-                name: "id",
-                table: "Users",
-                newName: "Id");
-
-            migrationBuilder.RenameColumn(
-                name: "id",
+                name: "link",
                 table: "Machines",
-                newName: "Id");
+                newName: "Link");
         }
     }
 }

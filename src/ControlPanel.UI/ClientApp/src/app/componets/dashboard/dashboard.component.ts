@@ -8,6 +8,7 @@ import { GetMetricsService } from 'src/app/services/GetMetrics/get-metrics.servi
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import ValidateForm from 'src/app/helpers/validateForm';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 
@@ -31,13 +32,15 @@ export class DashboardComponent {
     private notificationService: NotificationService,
     private http: HttpClient,
     private getMetricsService: GetMetricsService,
-    private auth:AuthService
-  ) {}
+    private auth: AuthService,
+    private snackBar: MatSnackBar
+  ) { }
+
   ngOnInit(): void {
     this.loadMachines();
     setInterval(() => {
       this.updateMachineData();
-    }, 5000);
+    }, 360000);
     this.dashboardForm = this.fb.group({
       Link: ['', Validators.required],
     })
@@ -48,20 +51,27 @@ export class DashboardComponent {
   }
   onButtonClick(): void {
     if (this.dashboardForm.invalid) {
-      alert('Enter the machine address');
+      this.OpenSnackBar('Enter the machine adres', 'Close')
       return;
     }
 
     this.dashboardService.Add(this.dashboardForm.value).subscribe(
       (response: any) => {
-        alert(response.message);
+        this.OpenSnackBar(response.message,'Close');
       },
       (err: any) => {
-        alert(err.error.message);
+        this.OpenSnackBar(err.error.message,'Close');
       }
     );
   }
-
+  
+  OpenSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 3000,
+      verticalPosition: "top",
+      horizontalPosition: "center"
+    });
+  }
   loadMachines() {
     this.http
       .get<Machine[]>('http://localhost:5143/Server/GetServers', {
@@ -74,10 +84,11 @@ export class DashboardComponent {
           this.machines = data;
         },
         (error) => {
-          console.error('Ошибка при загрузке данных:', error);
+          this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`,'Close');
         }
       );
   }
+
 
   showMachineDetails(machine: Machine) {
     if (this.selectedMachine === machine) {
@@ -108,7 +119,7 @@ export class DashboardComponent {
             }
           },
           (error) => {
-            console.error('Ошибка при обновлении данных машины:', error);
+            this.OpenSnackBar(`Ошибка при обновлении данных машины: ${error}`,'Close');
           }
         );
     }
@@ -118,10 +129,10 @@ export class DashboardComponent {
       console.log(this.selectedMachine.id)
       this.dashboardService.DeleteMachine(this.selectedMachine.id).subscribe(
         (response: any) => {
-          alert(response.message);
+          this.OpenSnackBar(response.message,'Close');
         },
         (err: any) => {
-          alert(err.error.message);
+          this.OpenSnackBar(err.error.message,'Close');
         }
       );
     }
@@ -141,14 +152,14 @@ export class DashboardComponent {
         return 0; 
       }),
       catchError((error) => {
-        console.error('Ошибка при обращении к API:', error);
+        this.OpenSnackBar(`Ошибка при обращении к API: ${error}`,'Close');
         return of(0); 
       })
     );
   }
  
   refreshMetrics() {
-    console.log('Refreshing metrics for:', this.selectedMachine);
+
     forkJoin([
       this.getMetr('node_load1'),
       this.getMetr('100 - (avg without(mode)(irate(node_cpu_seconds_total[1m])) * 100)'),
@@ -172,7 +183,7 @@ export class DashboardComponent {
         }
       },
       (error) => {
-        console.error('Ошибка при получении метрик:', error);
+        this.OpenSnackBar(`Ошибка при получении метрик: error`,'Close');
       }
     );
   }

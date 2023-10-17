@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ControlPanel.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231004115053_ChangeModels2")]
-    partial class ChangeModels2
+    [Migration("20231016162323_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,7 @@ namespace ControlPanel.Data.Migrations
                     b.Property<string>("Data")
                         .HasColumnType("text");
 
-                    b.Property<string>("Link")
+                    b.Property<string>("link")
                         .HasColumnType("text");
 
                     b.HasKey("id");
