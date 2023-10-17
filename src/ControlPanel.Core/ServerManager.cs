@@ -3,6 +3,7 @@ using ControlPanel.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using ControlPanel.Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using ControlPanel.Core.Result;
 
 namespace ControlPanel.Core
 {
@@ -14,11 +15,11 @@ namespace ControlPanel.Core
             _authContext = appDbContext;
 
         }
-        public async Task<bool> AddServer(ServerData serverData)
+        public async Task<bool> AddServer(ServerData serverData, int UserId)
         {
             try
             {
-                if (serverData is null || string.IsNullOrWhiteSpace(serverData.link))
+                if (serverData is null || string.IsNullOrWhiteSpace(serverData.link) || UserId <= 0)
                 {
                     return false;
                 }
@@ -31,15 +32,7 @@ namespace ControlPanel.Core
                     return false;
                 }
 
-                //var metricsUrl = $"http://{serverData.link}:9100/metrics";
-                //var httpClient = new HttpClient();
-                //var metricsResponse = await httpClient.GetAsync(metricsUrl);
-
-                //if (metricsResponse.IsSuccessStatusCode)
-                //{
-                //    var metricsData = await metricsResponse.Content.ReadAsStringAsync();
-                //    serverData.Data = metricsData;
-                //}
+                serverData.UserId = UserId;
 
                 await _authContext.Machines.AddAsync(serverData);
                 await _authContext.SaveChangesAsync();
@@ -60,9 +53,9 @@ namespace ControlPanel.Core
         {
             return await _authContext.Machines.AnyAsync(l => l.link == Link);
         }
-        public async Task<List<ControlPanel.Data.Models.ServerData>> GetServers()
+        public async Task<List<ControlPanel.Data.Models.ServerData>> GetServers(int userId)
         {
-            var machines = await _authContext.Machines.ToListAsync();
+            var machines = await _authContext.Machines.Where(m => m.UserId == userId).ToListAsync();
             return machines;
         }
 

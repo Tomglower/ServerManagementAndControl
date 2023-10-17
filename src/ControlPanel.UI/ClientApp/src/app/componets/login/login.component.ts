@@ -45,7 +45,9 @@ onLogin(){
         this.OpenSnackBar(res.message,'Close')
         this.loginForm.reset();
         this.auth.storeToken(res.token)
+        this.auth.storeId(res.id)
         this.router.navigate(['dashboard'])
+        console.log(res)
       },
       error:(err)=>{
         this.OpenSnackBar(err.error.message,'Close')

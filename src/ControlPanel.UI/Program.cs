@@ -43,7 +43,7 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddTransient<AuthManager>();
 builder.Services.AddTransient<ServerManager>();
 builder.Services.AddTransient<PrometheusExporter>();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 var app = builder.Build();
 try

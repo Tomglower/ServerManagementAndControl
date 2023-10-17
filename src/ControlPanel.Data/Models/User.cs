@@ -18,5 +18,7 @@ namespace ControlPanel.Data.Models
         public string Email { get; set; }
         public string Role { get; set; }
         public string Token { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<ServerData> Servers { get; set; }
     }
 }

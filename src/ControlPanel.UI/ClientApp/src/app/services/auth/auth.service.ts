@@ -29,7 +29,7 @@ export class AuthService {
   storeToken(tokenValue: string){
     localStorage.setItem('token',tokenValue)
   }
-
+  
   getToken(){
     return localStorage.getItem('token')
   }
@@ -42,7 +42,12 @@ export class AuthService {
     localStorage.clear();
     this.router.navigate(['login'])
   }
-    
+  storeId(idValue: string) {
+    localStorage.setItem('UserId', idValue)
+  }
+  getId(idValue: string) {
+    return localStorage.getItem('UserId')
+  }
   autoLogin() {
     const token = this.getToken ();
     if (token) {

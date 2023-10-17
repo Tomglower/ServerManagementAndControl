@@ -1,5 +1,6 @@
 ﻿using ControlPanel.Core;
 using ControlPanel.Core.Models;
+using ControlPanel.Core.Request;
 using ControlPanel.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,16 +25,40 @@ namespace ControlPanel.UI.Controllers
         }
 
 
+        //[HttpPost]
+        //[Authorize]
+        //[Route("AddServer")]
+        //public async Task<IActionResult> AddServer([FromBody] ServerData data)
+        //{
+        //    if (await _serverManager.CheckMachinelExist(data.link))
+        //    {
+        //        return BadRequest(new { Message = "Server already exist" });
+        //    }
+        //    var result = await _serverManager.AddServer(data);
+        //    if (result)
+        //    {
+        //        return Ok(new { Message = "Server Added!" });
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(new { Message = "Is not a Server!" });
+        //    }
+        //}
         [HttpPost]
         [Authorize]
         [Route("AddServer")]
-        public async Task<IActionResult> AddServer([FromBody] ServerData data)
+        public async Task<IActionResult> AddServer([FromBody] AddServerDataRequest request)
         {
-            if (await _serverManager.CheckMachinelExist(data.link))
+            if (await _serverManager.CheckMachinelExist(request.Link))
             {
-                return BadRequest(new { Message = "Server already exist" });
+                return BadRequest(new { Message = "Server already exists" });
             }
-            var result = await _serverManager.AddServer(data);
+
+            var result = await _serverManager.AddServer(new ServerData
+            {
+                link = request.Link
+            }, request.UserId);; // Передайте userId как второй аргумент
+
             if (result)
             {
                 return Ok(new { Message = "Server Added!" });
@@ -44,14 +69,21 @@ namespace ControlPanel.UI.Controllers
             }
         }
 
-
-        [HttpGet]
+        [HttpPost]
         [Authorize]
-        [Route("GetServers")]
-        public async Task<IActionResult> GetAllServers()
+        [Route("GetServer")]
+        public async Task<IActionResult> GetServer([FromBody] GetServerRequest request)
         {
-            var machines = await _serverManager.GetServers();
-            return Ok(machines);
+            int userId = request.UserId;
+
+            var server = await _serverManager.GetServers(userId);
+
+            if (server == null)
+            {
+                return NotFound(new { Message = "Server not found" });
+            }
+
+            return Ok(server);
         }
 
         [HttpPost]

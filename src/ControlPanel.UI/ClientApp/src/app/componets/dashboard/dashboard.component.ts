@@ -9,6 +9,7 @@ import { catchError, forkJoin, map, of } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import ValidateForm from 'src/app/helpers/validateForm';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { User } from 'oidc-client';
 
 
 
@@ -72,9 +73,15 @@ export class DashboardComponent {
       horizontalPosition: "center"
     });
   }
+
   loadMachines() {
+    const userId = localStorage.getItem('UserId');
+    console.log(userId);
+
+    const requestObject = { UserId: userId };
+
     this.http
-      .get<Machine[]>('http://localhost:5143/Server/GetServers', {
+      .post<Machine[]>('http://localhost:5143/Server/GetServer', requestObject, {
         headers: {
           'Authorization': `Bearer ${this.auth.getToken()}`
         }
@@ -84,7 +91,7 @@ export class DashboardComponent {
           this.machines = data;
         },
         (error) => {
-          this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`,'Close');
+          this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`, 'Close');
         }
       );
   }

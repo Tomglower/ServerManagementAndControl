@@ -33,12 +33,12 @@ namespace ControlPanel.UI.Controllers
             try
             {
                 var result = await _authController.Authenticate(user);
-                if (result)
+                if (result.Res)
                 {
-                    Console.WriteLine("Controller" + user.Token.ToString());
 
                     return Ok(new
                     {
+                        id = result.Id, 
                         Token = user.Token,
                         Message = "Login Success!"
                     });

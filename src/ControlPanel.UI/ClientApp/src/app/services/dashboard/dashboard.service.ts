@@ -12,13 +12,12 @@ export class DashboardService {
   constructor(private http:HttpClient, private auth:AuthService) { }
 
   Add(machObj: any) {
-    console.log(this.auth.getToken())
+    machObj.UserId = localStorage.getItem('UserId');
     return this.http.post<any>(`${this.baseUrl}AddServer`, machObj, {
       headers: {
         'Authorization': `Bearer ${this.auth.getToken()}`
       }
     })
-   
   }
   Check(machObj: any) {
     return this.http.post<any>(`${this.baseUrl}CheckMachine`, machObj, {

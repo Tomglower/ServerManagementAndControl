@@ -32,10 +32,15 @@ namespace ControlPanel.Data.Migrations
                     b.Property<string>("Data")
                         .HasColumnType("text");
 
-                    b.Property<string>("Link")
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("link")
                         .HasColumnType("text");
 
                     b.HasKey("id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Machines");
                 });
@@ -66,6 +71,22 @@ namespace ControlPanel.Data.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ControlPanel.Data.Models.ServerData", b =>
+                {
+                    b.HasOne("ControlPanel.Data.Models.User", "User")
+                        .WithMany("Servers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ControlPanel.Data.Models.User", b =>
+                {
+                    b.Navigation("Servers");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,6 +5,7 @@ using System.Text;
 using ControlPanel.Data;
 using Microsoft.EntityFrameworkCore;
 using ControlPanel.Data.Models;
+using ControlPanel.Core.Result;
 using ControlPanel.Core.Models;
 
 namespace ControlPanel.Core;
@@ -21,29 +22,35 @@ public class AuthManager
     }
 
 
-    public async Task<bool> Authenticate(User user)
+    public async Task<AuthResult> Authenticate(User user)
     {
-        if (user is null) 
-        { 
-            return false; 
+        var result = new AuthResult();
+
+        if (user is null)
+        {
+            result.Res = false;
         }
 
         var CheckedUser = await _authContext.Users.FirstOrDefaultAsync(Users => Users.UserName == user.UserName);
 
-        if (CheckedUser is null) 
-        { 
-            return false;
-        }
-
-        if (!PasswordHasher.VerifyPassword(user.Password, CheckedUser.Password))
+        if (CheckedUser is null)
         {
-            return false;
+            result.Res = false;
         }
 
-        user.Token = CreateJwtToken(CheckedUser);
-        
-        return true;
+        if (PasswordHasher.VerifyPassword(user.Password, CheckedUser.Password))
+        {
+            user.Token = CreateJwtToken(CheckedUser);
+            CheckedUser.Token = user.Token;
+            _authContext.Entry(CheckedUser).State = EntityState.Modified;
+            await _authContext.SaveChangesAsync();
+            result.Res = true;
+            result.Id = CheckedUser.id;
+        }
+
+        return result;
     }
+
 
 
     private string CreateJwtToken(User user)

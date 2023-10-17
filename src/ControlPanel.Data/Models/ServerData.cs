@@ -13,6 +13,7 @@ namespace ControlPanel.Data.Models
         public int id { get; set; }
         public string link { get; set; }
         public string Data { get; set; }
-
+        public int UserId { get; set; }
+        public virtual User User { get; set; }
     }
 }
