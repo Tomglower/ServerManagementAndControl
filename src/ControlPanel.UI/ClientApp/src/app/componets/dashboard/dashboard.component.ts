@@ -13,7 +13,6 @@ import { User } from 'oidc-client';
 
 
 
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -38,6 +37,7 @@ export class DashboardComponent {
   ) { }
 
   ngOnInit(): void {
+    this.auth.autoLogin(); 
     this.loadMachines();
     setInterval(() => {
       this.updateMachineData();

@@ -46,14 +46,18 @@ builder.Services.AddTransient<PrometheusExporter>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 var app = builder.Build();
+var logger = app.Services.GetService<ILogger<AppDbContext>>();
+
 try
 {
     var dbContext = app.Services.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
+    logger.LogDebug("Миграции применены успешно");
 }
 catch (Exception ex)
 {
-    Console.WriteLine("Произошла ошибка при миграции базы данных: " + ex.Message);
+   logger.LogError("Произошла ошибка при миграции базы данных: " + ex.Message);
+    return;
 }
 
 app.UseCors("MyPolicy");

@@ -60,6 +60,18 @@ export class AuthService {
       }
     }
   }
+  CheckTokendashboard() {
+    const token = this.getToken();
+    if (token) {
+      if (this.CheckToken(token)) {
+        console.log("true")
+      }
+      else {
+        this.router.navigate(['login']);
+        console.log("false")
+      }
+    }
+  }
 
  
 

@@ -31,7 +31,10 @@ namespace ControlPanel.Core
                     Console.WriteLine(checkResult.Message);
                     return false;
                 }
-
+                if (serverData.link.ToLower() == "localhost")
+                {
+                    serverData.link = "127.0.0.1"; 
+                }
                 serverData.UserId = UserId;
 
                 await _authContext.Machines.AddAsync(serverData);
