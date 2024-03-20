@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -8,12 +9,14 @@ public class TelegramBotBackgroundService : BackgroundService
 {
     private readonly ILogger<TelegramBotBackgroundService> _logger;
     private readonly ITelegramBotClient _botClient;
+    private readonly IConfiguration _config;
 
-    public TelegramBotBackgroundService(ILogger<TelegramBotBackgroundService> logger)
+    public TelegramBotBackgroundService(ILogger<TelegramBotBackgroundService> logger, IConfiguration config)
     {
+        _config = config;
         _logger = logger;
         // Замените "your_bot_token" на токен вашего бота.
-        _botClient = new TelegramBotClient("6693017715:AAHGt7R04io5CQaJuzPCPKqOlr0ovJ7iwOw");
+        _botClient = new TelegramBotClient(_config.GetValue<string>("Token") ?? string.Empty);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
