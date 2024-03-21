@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlPanel.Data", "Contro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlPanel.UI", "ControlPanel.UI\ControlPanel.UI.csproj", "{37418934-2CA4-4A21-BC7D-1C0CB36DC4F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramWorker", "TelegramWorker\TelegramWorker.csproj", "{D6E2BD3C-F52C-49AE-B933-2F2D7C4F5602}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlPanel.Bot", "ControlPanel.Bot\ControlPanel.Bot.csproj", "{D6E2BD3C-F52C-49AE-B933-2F2D7C4F5602}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-TelegramWorker-F79F2A0F-73A9-41C7-A8EA-F26FF5E53D31</UserSecretsId>
+        <RootNamespace>TelegramWorker</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

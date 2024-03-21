@@ -10,12 +10,12 @@ public class TelegramBotBackgroundService : BackgroundService
     private readonly ILogger<TelegramBotBackgroundService> _logger;
     private readonly ITelegramBotClient _botClient;
     private readonly IConfiguration _config;
+    private readonly HttpClient _httpClient;
 
     public TelegramBotBackgroundService(ILogger<TelegramBotBackgroundService> logger, IConfiguration config)
     {
         _config = config;
         _logger = logger;
-        // Замените "your_bot_token" на токен вашего бота.
         _botClient = new TelegramBotClient(_config.GetValue<string>("Token") ?? string.Empty);
     }
 

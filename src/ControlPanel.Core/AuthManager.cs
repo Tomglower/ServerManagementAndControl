@@ -130,5 +130,22 @@ public class AuthManager
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("veryverysecret....."))
         };
     }
+    private string CreateSimpleJwtToken()
+    {
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes("veryverysecret....."); 
+
+        var identity = new ClaimsIdentity();
+
+        var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = identity,
+            Expires = DateTime.UtcNow.AddDays(7), 
+            SigningCredentials = credentials
+        };
+        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+        return jwtTokenHandler.WriteToken(token);
+    }
 
 }
