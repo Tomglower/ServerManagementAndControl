@@ -37,7 +37,7 @@ export class DashboardComponent {
   ) { }
 
   ngOnInit(): void {
-    this.auth.autoLogin(); 
+    this.auth.autoLogin();
     this.loadMachines();
     setInterval(() => {
       this.updateMachineData();
@@ -47,8 +47,8 @@ export class DashboardComponent {
     })
     this.dashboardForm.controls['Link'].valueChanges
       .pipe(
-        debounceTime(1000), 
-        throttle(() => interval(1000)) 
+        debounceTime(1000),
+        throttle(() => interval(1000))
       )
       .subscribe(
         (value: any) => {
@@ -57,7 +57,7 @@ export class DashboardComponent {
             (response: any) => {
               this.OpenSnackBar(response.message, 'Close');
             }
-            
+
           );
         }
       );
@@ -81,7 +81,7 @@ export class DashboardComponent {
       }
     );
   }
-  
+
   OpenSnackBar(message: string, action: string) {
     this.snackBar.open(message, action, {
       duration: 3000,
@@ -147,7 +147,7 @@ export class DashboardComponent {
     }
   }
   deleteMachine(machine: Machine) {
-    
+
     if (this.selectedMachine == machine) {
       const request = { id: this.selectedMachine.id };
       this.dashboardService.DeleteMachine(request).subscribe(
@@ -163,25 +163,29 @@ export class DashboardComponent {
   }
   getMetr(query: string) {
     if (!this.selectedMachine) {
-      return of(0); 
+      return of(0);
     }
-  
+
     return this.dashboardService.getMetrics(this.selectedMachine.link, query).pipe(
       map((response) => {
-        const result = response.data.result[0]; 
+        const result = response.data.result[0];
         if (result && result.value && result.value[1]) {
           const Metrics = parseFloat(result.value[1]);
           return Metrics;
         }
-        return 0; 
+        return 0;
       }),
       catchError((error) => {
         this.OpenSnackBar(`Ошибка при обращении к API: ${error}`,'Close');
-        return of(0); 
+        return of(0);
       })
     );
   }
- 
+  getBotLink(): string {
+    const userId = localStorage.getItem('UserId') || '';
+    const startParameter = encodeURIComponent(userId);
+    return `https://t.me/ControlPanelServiceBot?start=${startParameter}`;
+  }
   refreshMetrics() {
 
     forkJoin([

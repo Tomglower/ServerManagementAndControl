@@ -5,11 +5,15 @@ using System.Text.Json;
 using ControlPanel.Core.Models;
 using ControlPanel.Core.Result;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types.ReplyMarkups;
+using TelegramWorker;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 public class TelegramBotBackgroundService : BackgroundService
 {
@@ -49,9 +53,11 @@ public class TelegramBotBackgroundService : BackgroundService
 
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
-
-    // private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    
+    // private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+    //     CancellationToken cancellationToken)
     // {
+    //     string id = null;
     //     if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.Text)
     //     {
     //         var chatId = update.Message.Chat.Id;
@@ -59,78 +65,257 @@ public class TelegramBotBackgroundService : BackgroundService
     //
     //         _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
     //
-    //         // Эхо ответ бота
-    //         await botClient.SendTextMessageAsync(chatId, $"You said: {messageText}", cancellationToken: cancellationToken);
+    //         if (messageText.StartsWith("/start"))
+    //         {
+    //             var commandParts = messageText.Split(' ');
+    //
+    //             if (commandParts.Length > 1)
+    //             {
+    //                 id = commandParts[1];
+    //
+    //                 await botClient.SendTextMessageAsync(chatId, $"Привет! Ваш ID: {id}",
+    //                     cancellationToken: cancellationToken);
+    //                 
+    //             }
+    //             else
+    //             {
+    //                 await botClient.SendTextMessageAsync(chatId, "Привет! Как я могу помочь вам сегодня?",
+    //                     cancellationToken: cancellationToken);
+    //             }
+    //         }
+    //         else if (IPAddress.TryParse(messageText, out var ipAddress))
+    //         {
+    //             try
+    //             {
+    //                 var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
+    //                 await botClient.SendTextMessageAsync(chatId, apiResponse, cancellationToken: cancellationToken);
+    //             }
+    //             catch (Exception ex)
+    //             {
+    //                 await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
+    //                     cancellationToken: cancellationToken);
+    //                 _logger.LogError(ex, "Error calling the API.");
+    //             }
+    //         }
+    //         else
+    //         {
+    //             await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
+    //                 cancellationToken: cancellationToken);
+    //         }
+    //         if (messageText.StartsWith("/getserver"))
+    //         {
+    //             var userId = "1"; 
+    //
+    //             try
+    //             {
+    //                 var servers = await GetServersForUser(userId, cancellationToken);
+    //
+    //                 if (servers.Any())
+    //                 {
+    //                     var inlineKeyboard = new InlineKeyboardMarkup(servers.Select(server =>
+    //                         InlineKeyboardButton.WithCallbackData(server.Link,server.Link )).ToArray());
+    //
+    //                     await botClient.SendTextMessageAsync(chatId, "Выберите сервер:", replyMarkup: inlineKeyboard, cancellationToken: cancellationToken);
+    //                 }
+    //                 else
+    //                 {
+    //                     await botClient.SendTextMessageAsync(chatId, "Список серверов пуст.", cancellationToken: cancellationToken);
+    //                 }
+    //             }
+    //             catch (HttpRequestException ex)
+    //             {
+    //                 _logger.LogError(ex, "Ошибка при получении списка серверов.");
+    //                 await botClient.SendTextMessageAsync(chatId, "Ошибка при получении списка серверов.", cancellationToken: cancellationToken);
+    //             }
+    //         }
+    //        
     //     }
     // }
-  private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-{
-    if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.Text)
+    //TODO: подумать над сохранением id пользователя, добавления всех полей в ответ и парсинг всех запросов прометеуса 
+    
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+        CancellationToken cancellationToken)
     {
-        var chatId = update.Message.Chat.Id;
-        var messageText = update.Message.Text;
+        string id = null;
+        var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message.Chat.Id;
 
-        _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
-
-        if (IPAddress.TryParse(messageText, out var ipAddress))
+        if (update.Type == UpdateType.Message && update.Message.Type == MessageType.Text)
         {
-            try
+            var messageText = update.Message.Text;
+    
+            _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
+    
+            if (messageText.StartsWith("/start"))
             {
-                var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
-                await botClient.SendTextMessageAsync(chatId, apiResponse, cancellationToken: cancellationToken);
+                var commandParts = messageText.Split(' ');
+    
+                if (commandParts.Length > 1)
+                {
+                    id = commandParts[1];
+    
+                    await botClient.SendTextMessageAsync(chatId, $"Привет! Ваш ID: {id}",
+                        cancellationToken: cancellationToken);
+                    
+                }
+                else
+                {
+                    await botClient.SendTextMessageAsync(chatId, "Привет! Как я могу помочь вам сегодня?",
+                        cancellationToken: cancellationToken);
+                }
             }
-            catch (Exception ex)
+            else if (IPAddress.TryParse(messageText, out var ipAddress))
             {
-                await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.", cancellationToken: cancellationToken);
-                _logger.LogError(ex, "Error calling the API.");
+                try
+                {
+                    var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
+                    await botClient.SendTextMessageAsync(chatId, apiResponse, cancellationToken: cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
+                        cancellationToken: cancellationToken);
+                    _logger.LogError(ex, "Error calling the API.");
+                }
             }
+            else
+            {
+                await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
+                    cancellationToken: cancellationToken);
+            }
+            if (messageText.StartsWith("/getserver"))
+            {
+                var userId = "1"; 
+
+                try
+                {
+                    var servers = await GetServersForUser(userId, cancellationToken);
+
+                    if (servers.Any())
+                    {
+                        var inlineKeyboard = new InlineKeyboardMarkup(servers.Select(server =>
+                            InlineKeyboardButton.WithCallbackData(server.Link,server.Link )).ToArray());
+
+                        await botClient.SendTextMessageAsync(chatId, "Выберите сервер:", replyMarkup: inlineKeyboard, cancellationToken: cancellationToken);
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(chatId, "Список серверов пуст.", cancellationToken: cancellationToken);
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    _logger.LogError(ex, "Ошибка при получении списка серверов.");
+                    await botClient.SendTextMessageAsync(chatId, "Ошибка при получении списка серверов.", cancellationToken: cancellationToken);
+                }
+            }
+            
+           
         }
-        else
+        else if (update.Type == UpdateType.CallbackQuery)
         {
-            await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.", cancellationToken: cancellationToken);
+            // Получаем данные callback_query
+            var callbackQuery = update.CallbackQuery;
+            var callbackData = callbackQuery.Data;
+            var callbackChatId = callbackQuery.Message.Chat.Id;
+
+            // Ответ на callback_query, чтобы убрать "грузящийся" индикатор на кнопке
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, cancellationToken: cancellationToken);
+
+            // Проверяем, является ли callbackData валидным IP-адресом
+            if (IPAddress.TryParse(callbackData, out var ipAddress))
+            {
+                try
+                {
+                    // Вызываем метод, который обрабатывает IP-адрес
+                    var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
+                    await botClient.SendTextMessageAsync(callbackChatId, apiResponse, cancellationToken: cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    await botClient.SendTextMessageAsync(callbackChatId, "Произошла ошибка при обращении к API.",
+                        cancellationToken: cancellationToken);
+                    _logger.LogError(ex, "Error calling the API.");
+                }
+            }
+            else
+            {
+                // Если callbackData не является валидным IP, отправляем сообщение об ошибке
+                await botClient.SendTextMessageAsync(callbackChatId, "Пожалуйста, отправьте валидный IP адрес.",
+                    cancellationToken: cancellationToken);
+            }
         }
     }
-}
+    private async Task<IEnumerable<Server>> GetServersForUser(string userId, CancellationToken cancellationToken)
+    {
+        var userServersRequest = new
+        {
+            UserId = userId
+        };
 
-  private async Task<string> GetApiResponse(string ipAddress, CancellationToken cancellationToken)
-  {
-      var machineQueryRequest = new MachineQueryRequest
-      {
-          Link = ipAddress,
-          Query = "node_load1"
-      };
+        var jsonRequest = JsonSerializer.Serialize(userServersRequest);
+        var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-      var jsonRequest = JsonSerializer.Serialize(machineQueryRequest);
-      var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5143/Server/GetServer")
+        {
+            Content = httpContent
+        };
 
-      var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:5143/Prometheus/GetMetricsPrometheus")
-      {
-          Content = httpContent
-      };
+        // Здесь предполагается, что токен хранится в конфигурации (например, в appsettings.json)
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.GetValue<string>("bearer"));
 
-      request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.GetValue<string>("bearer"));
+        var response = await _httpClient.SendAsync(request, cancellationToken);
 
-      var response = await _httpClient.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError($"API request failed with status code: {response.StatusCode}");
+            return Enumerable.Empty<Server>();
+        }
 
-      if (!response.IsSuccessStatusCode)
-      {
-          throw new HttpRequestException($"API request failed with status code: {response.StatusCode}");
-      }
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var servers = JsonSerializer.Deserialize<IEnumerable<Server>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-      var content = await response.Content.ReadAsStringAsync(cancellationToken);
-      return content;
-  }
-  
-    private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        return servers ?? Enumerable.Empty<Server>();
+    }
+    private async Task<string> GetApiResponse(string ipAddress, CancellationToken cancellationToken)
+    {
+        var machineQueryRequest = new MachineQueryRequest
+        {
+            Link = ipAddress,
+            Query = "node_load1"
+        };
+
+        var jsonRequest = JsonSerializer.Serialize(machineQueryRequest);
+        var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:5143/Prometheus/GetMetricsPrometheus")
+        {
+            Content = httpContent
+        };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.GetValue<string>("bearer"));
+
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException($"API request failed with status code: {response.StatusCode}");
+        }
+
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        return content;
+    }
+
+    private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+        CancellationToken cancellationToken)
     {
         var errorMessage = exception switch
         {
-            ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+            ApiRequestException apiRequestException =>
+                $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
             _ => exception.ToString()
         };
 
         _logger.LogError(errorMessage);
         return Task.CompletedTask;
     }
-    
 }

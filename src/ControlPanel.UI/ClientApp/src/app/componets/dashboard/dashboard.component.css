@@ -1,6 +1,6 @@
 .mat-toolbar {
-  background-color: #2f2fa2; 
-  color: white; 
+  background-color: #2f2fa2;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -8,7 +8,7 @@
 
 .spacer {
   flex: 1;
-  
+
 }
 .btn {
   margin-left: 10px;
@@ -34,4 +34,18 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
+}
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #2f2fa2; /* Цвет фона футера */
+  color: white; /* Цвет текста футера */
+  text-align: center;
+  padding: 10px 0;
+}
+
+.footer a {
+  color: white; /* Цвет текста ссылки в футере */
 }
