@@ -13,6 +13,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramWorker;
+using ApiResponse = TelegramWorker.ApiResponse;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 public class TelegramBotBackgroundService : BackgroundService
@@ -163,20 +164,21 @@ public class TelegramBotBackgroundService : BackgroundService
                         cancellationToken: cancellationToken);
                 }
             }
-            else if (IPAddress.TryParse(messageText, out var ipAddress))
-            {
-                try
-                {
-                    var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
-                    await botClient.SendTextMessageAsync(chatId, apiResponse, cancellationToken: cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
-                        cancellationToken: cancellationToken);
-                    _logger.LogError(ex, "Error calling the API.");
-                }
-            }
+            // else if (IPAddress.TryParse(messageText, out var ipAddress))
+            // {
+            //     try
+            //     {
+            //         double loadValue = await GetLoadValueFromApiResponse(ipAddress.ToString(), cancellationToken);
+            //         await botClient.SendTextMessageAsync(chatId, loadValue.ToString("F2"), cancellationToken: cancellationToken);
+            //
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
+            //             cancellationToken: cancellationToken);
+            //         _logger.LogError(ex, "Error calling the API.");
+            //     }
+            // }
             else
             {
                 await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
@@ -227,8 +229,17 @@ public class TelegramBotBackgroundService : BackgroundService
                 try
                 {
                     // Вызываем метод, который обрабатывает IP-адрес
-                    var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
-                    await botClient.SendTextMessageAsync(callbackChatId, apiResponse, cancellationToken: cancellationToken);
+                    double load = await GetLoadValueFromApiResponse(ipAddress.ToString(),"node_load1", cancellationToken);
+                    double cpuUsage = await GetLoadValueFromApiResponse(ipAddress.ToString(),"100 - (avg without(mode)(irate(node_cpu_seconds_total[1m])) * 100)", cancellationToken);
+                    double memoryUsage = await GetLoadValueFromApiResponse(ipAddress.ToString(),"(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024 / 1024", cancellationToken);
+                    double diskUsage = await GetLoadValueFromApiResponse(ipAddress.ToString(),"(sum(node_filesystem_size_bytes - node_filesystem_free_bytes) by (instance)) / 1073741824", cancellationToken);
+                    double memoryFull = await GetLoadValueFromApiResponse(ipAddress.ToString(),"round(node_memory_MemTotal_bytes / 1024 / 1024 / 1024)", cancellationToken);
+                    double discfull = await GetLoadValueFromApiResponse(ipAddress.ToString(),"sum(node_filesystem_size_bytes) / 1024 / 1024 / 1024", cancellationToken);
+                    double networkTransmit = await GetLoadValueFromApiResponse(ipAddress.ToString(),"irate(node_network_transmit_bytes_total[5m])", cancellationToken);
+                    double networkReceive = await GetLoadValueFromApiResponse(ipAddress.ToString(),"irate(node_network_transmit_bytes_total[5m])", cancellationToken);
+                    string resp =
+                        $" IP: {ipAddress}\n Загрузка: {load.ToString("F2")}\n Использование процессора: {cpuUsage.ToString("F2")} %\n Оперативная память: {memoryUsage.ToString("F2")} / {memoryFull.ToString("F2")} ГБ\n Использование диска: {diskUsage.ToString("F2")} / {discfull.ToString("F2")} ГБ\n Отданные пакеты: {networkTransmit.ToString("F2")}\n Полученные пакеты: {networkReceive.ToString("F2")}";
+                    await botClient.SendTextMessageAsync(chatId, resp, cancellationToken: cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -245,6 +256,24 @@ public class TelegramBotBackgroundService : BackgroundService
             }
         }
     }
+    private async Task<double> GetLoadValueFromApiResponse(string ipAddress,string parameter, CancellationToken cancellationToken)
+    {
+        var jsonResponse = await GetApiResponse(ipAddress,parameter, cancellationToken);
+    
+        var apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        if (apiResponse?.Status == "success" && apiResponse.Data?.Result != null && apiResponse.Data.Result.Any())
+        {
+            // Предполагаем, что 'value' всегда содержит два элемента: timestamp и значение нагрузки.
+            double loadValue = Convert.ToDouble(apiResponse.Data.Result[0].Value[1]);
+            return loadValue;
+        }
+
+        throw new Exception("Не удалось извлечь значение нагрузки из ответа API.");
+    }
     private async Task<IEnumerable<Server>> GetServersForUser(string userId, CancellationToken cancellationToken)
     {
         var userServersRequest = new
@@ -260,7 +289,6 @@ public class TelegramBotBackgroundService : BackgroundService
             Content = httpContent
         };
 
-        // Здесь предполагается, что токен хранится в конфигурации (например, в appsettings.json)
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.GetValue<string>("bearer"));
 
         var response = await _httpClient.SendAsync(request, cancellationToken);
@@ -276,12 +304,12 @@ public class TelegramBotBackgroundService : BackgroundService
 
         return servers ?? Enumerable.Empty<Server>();
     }
-    private async Task<string> GetApiResponse(string ipAddress, CancellationToken cancellationToken)
+    private async Task<string> GetApiResponse(string ipAddress, string parameter, CancellationToken cancellationToken)
     {
         var machineQueryRequest = new MachineQueryRequest
         {
             Link = ipAddress,
-            Query = "node_load1"
+            Query = parameter
         };
 
         var jsonRequest = JsonSerializer.Serialize(machineQueryRequest);
