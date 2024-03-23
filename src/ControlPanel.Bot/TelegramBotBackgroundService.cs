@@ -238,7 +238,7 @@ public class TelegramBotBackgroundService : BackgroundService
                     double networkTransmit = await GetLoadValueFromApiResponse(ipAddress.ToString(),"irate(node_network_transmit_bytes_total[5m])", cancellationToken);
                     double networkReceive = await GetLoadValueFromApiResponse(ipAddress.ToString(),"irate(node_network_transmit_bytes_total[5m])", cancellationToken);
                     string resp =
-                        $" IP: {ipAddress}\n Загрузка: {load.ToString("F2")}\n Использование процессора: {cpuUsage.ToString("F2")} %\n Оперативная память: {memoryUsage.ToString("F2")} / {memoryFull.ToString("F2")} ГБ\n Использование диска: {diskUsage.ToString("F2")} / {discfull.ToString("F2")} ГБ\n Отданные пакеты: {networkTransmit.ToString("F2")}\n Полученные пакеты: {networkReceive.ToString("F2")}";
+                        $"IP: {ipAddress}\nЗагрузка: {load.ToString("F2")}\nИспользование процессора: {cpuUsage.ToString("F2")} %\nОперативная память: {memoryUsage.ToString("F2")} / {memoryFull.ToString("F2")} ГБ\nИспользование диска: {diskUsage.ToString("F2")} / {discfull.ToString("F2")} ГБ\nОтданные пакеты: {networkTransmit.ToString("F2")}\nПолученные пакеты: {networkReceive.ToString("F2")}";
                     await botClient.SendTextMessageAsync(chatId, resp, cancellationToken: cancellationToken);
                 }
                 catch (Exception ex)
