@@ -10,7 +10,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import ValidateForm from 'src/app/helpers/validateForm';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from 'oidc-client';
-
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
@@ -33,7 +33,8 @@ export class DashboardComponent {
     private http: HttpClient,
     private getMetricsService: GetMetricsService,
     private auth: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -62,12 +63,14 @@ export class DashboardComponent {
         }
       );
   }
+
   logout() {
     this.auth.signOut();
   }
+
   onButtonClick(): void {
     if (this.dashboardForm.invalid) {
-      this.OpenSnackBar('Enter the machine adres', 'Close')
+      this.OpenSnackBar('Enter the machine address', 'Close')
       return;
     }
 
@@ -104,11 +107,33 @@ export class DashboardComponent {
       .subscribe(
         (data: Machine[]) => {
           this.machines = data;
+          this.checkMachineStatus();
+          console.log(data)
         },
         (error) => {
           this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`, 'Close');
         }
       );
+  }
+  checkMachineStatus() {
+    for (const machine of this.machines) {
+      this.http
+        .post<any>('http://localhost:5143/Server/GetStatus', {link: machine.link}, {
+          headers: {
+            'Authorization': `Bearer ${this.auth.getToken()}`
+          }
+        })
+        .subscribe(
+          (response: any) => {
+            console.log('API response:', response);
+            machine.isActive = response;
+            this.cdr.detectChanges(); // Принудительно обновляем представление
+          },
+          (error) => {
+            this.OpenSnackBar(`Ошибка при проверке статуса: ${error.message}`, 'Close');
+          }
+        );
+    }
   }
 
 

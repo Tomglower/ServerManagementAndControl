@@ -137,7 +137,7 @@ public class TelegramBotBackgroundService : BackgroundService
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        string id = null;
+        string id = "1";
         var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message.Chat.Id;
 
         if (update.Type == UpdateType.Message && update.Message.Type == MessageType.Text)
@@ -278,7 +278,7 @@ public class TelegramBotBackgroundService : BackgroundService
     {
         var userServersRequest = new
         {
-            UserId = userId
+            UserId = 1
         };
 
         var jsonRequest = JsonSerializer.Serialize(userServersRequest);

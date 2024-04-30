@@ -26,14 +26,22 @@
         <div class="mt-4">
           <h3>Список машин</h3>
           <mat-list>
-            <mat-list-item *ngFor="let machine of machines" (click)="showMachineDetails(machine)" [ngClass]="{'selected-list-item': machine === selectedMachine}" class="border">
+            <mat-list-item *ngFor="let machine of machines"
+                           (click)="showMachineDetails(machine)"
+                           [ngClass]="{'selected-list-item': machine === selectedMachine}"
+                           class="border">
               <a (click)="$event.stopPropagation()">{{ machine.link }}</a>
+              <!-- Уменьшаем размер и делаем его аккуратнее -->
+              <mat-icon [ngStyle]="{ color: machine.isActive ? '#4CAF50' : '#F44336', 'font-size': '16px', 'border-radius': '50%' }">
+                lens
+              </mat-icon>
               <button mat-button [matMenuTriggerFor]="menu" class="menu-button"><mat-icon>more_vert</mat-icon></button>
               <mat-menu #menu="matMenu">
                 <button mat-menu-item (click)="deleteMachine(machine); $event.stopPropagation()">Удалить</button>
               </mat-menu>
             </mat-list-item>
           </mat-list>
+
         </div>
     </div>
     <div class="col-md-8">
@@ -47,7 +55,7 @@
           <pre>DiskUsage: {{ selectedMachine.diskUsage }} \ {{ selectedMachine.diskFull }} GB</pre>
           <pre>NetworkTransmit: {{ selectedMachine.networkTransmit }} MB</pre>
           <pre>NetworkReceive: {{ selectedMachine.networkReceive }} MB</pre>
-          <pre>{{ selectedMachine.data }}</pre>
+<!--          <pre>{{ selectedMachine.data }}</pre>-->
         </mat-card>
       </div>
     </div>

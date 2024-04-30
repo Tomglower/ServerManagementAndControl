@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Reflection.PortableExecutable;
 using System.Security.Claims;
 using System.Text;
@@ -144,6 +145,18 @@ namespace ControlPanel.UI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { Message = "Ошибка: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("GetStatus")]
+        public async Task<bool> GetStatus(CheckMachineRequest req)
+        {
+            using (Ping ping = new Ping())
+            { 
+                PingReply reply = await ping.SendPingAsync(req.Link, 1000);
+                return reply.Status == IPStatus.Success;
             }
         }
 

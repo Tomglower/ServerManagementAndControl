@@ -33,7 +33,7 @@ export class DashboardService {
         'Authorization': `Bearer ${this.auth.getToken()}`
       }
     })
-    
+
   }
   DeleteMachine(machObj: any) {
     return this.http.post<any>(`${this.baseUrl}DeleteMachine`, machObj, {
@@ -53,5 +53,5 @@ export class DashboardService {
       }
     });
   }
-  
+
 }
