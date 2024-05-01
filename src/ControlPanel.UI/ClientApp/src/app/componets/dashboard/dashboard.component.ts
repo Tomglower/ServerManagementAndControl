@@ -214,6 +214,10 @@ export class DashboardComponent {
     return `https://t.me/ControlPanelServiceBot?start=${startParameter}`;
   }
 
+  openMachineServer(link: string) {
+    const serverUrl = `http://${link}:9090/classic/graph`;
+    window.open(serverUrl, '_blank');
+  }
 
   refreshMetrics() {
 
