@@ -22,6 +22,7 @@
           </mat-form-field>
           <button mat-raised-button (click)="onButtonClick()" color="primary" type="submit">Добавить машину</button>
         </mat-card>
+
       </form>
         <div class="mt-4">
           <h3>Список машин</h3>
@@ -47,16 +48,64 @@
     <div class="col-md-8">
       <div *ngIf="selectedMachine">
         <button mat-raised-button color="primary" (click)="updateMachineData()">Обновить данные</button>
+<!--        <mat-card>-->
+<!--          <h3>Детали машины</h3>-->
+<!--          <pre>Load: {{ selectedMachine.load }} </pre>-->
+<!--          <pre>CpuUsage: {{ selectedMachine.cpuUsage }} %</pre>-->
+<!--          <pre>MemoryUsage: {{ selectedMachine.memoryUsage }} \ {{ selectedMachine.memoryFull }} GB</pre>-->
+<!--          <pre>DiskUsage: {{ selectedMachine.diskUsage }} \ {{ selectedMachine.diskFull }} GB</pre>-->
+<!--          <pre>NetworkTransmit: {{ selectedMachine.networkTransmit }} MB</pre>-->
+<!--          <pre>NetworkReceive: {{ selectedMachine.networkReceive }} MB</pre>-->
+<!--&lt;!&ndash;          <pre>{{ selectedMachine.data }}</pre>&ndash;&gt;-->
+<!--        </mat-card>-->
         <mat-card>
           <h3>Детали машины</h3>
-          <pre>Load: {{ selectedMachine.load }} </pre>
-          <pre>CpuUsage: {{ selectedMachine.cpuUsage }} %</pre>
-          <pre>MemoryUsage: {{ selectedMachine.memoryUsage }} \ {{ selectedMachine.memoryFull }} GB</pre>
-          <pre>DiskUsage: {{ selectedMachine.diskUsage }} \ {{ selectedMachine.diskFull }} GB</pre>
-          <pre>NetworkTransmit: {{ selectedMachine.networkTransmit }} MB</pre>
-          <pre>NetworkReceive: {{ selectedMachine.networkReceive }} MB</pre>
-<!--          <pre>{{ selectedMachine.data }}</pre>-->
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>cached</mat-icon> Загрузка:</span>
+            <span>{{ selectedMachine.load }}</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>developer_board</mat-icon> Использование CPU:</span>
+            <span>{{ selectedMachine.cpuUsage }} %</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>memory</mat-icon> Использование памяти:</span>
+            <span>{{ selectedMachine.memoryUsage }} / {{ selectedMachine.memoryFull }} GB</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>sd_storage</mat-icon> Использование диска:</span>
+            <span>{{ selectedMachine.diskUsage }} / {{ selectedMachine.diskFull }} GB</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>wifi</mat-icon> Передача данных:</span>
+            <span>{{ selectedMachine.networkTransmit }} MB</span>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><mat-icon>wifi</mat-icon> Получение данных:</span>
+            <span>{{ selectedMachine.networkReceive }} MB</span>
+          </div>
+
+          <mat-divider></mat-divider>
         </mat-card>
+
       </div>
     </div>
   </div>

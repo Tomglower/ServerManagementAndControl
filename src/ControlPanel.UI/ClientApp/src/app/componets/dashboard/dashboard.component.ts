@@ -42,7 +42,8 @@ export class DashboardComponent {
     this.loadMachines();
     setInterval(() => {
       this.updateMachineData();
-    }, 360000);
+      this.loadMachines();
+    }, 5000);
     this.dashboardForm = this.fb.group({
       Link: ['', Validators.required],
     })
@@ -162,6 +163,7 @@ export class DashboardComponent {
           (response: any) => {
             if (this.selectedMachine) {
               this.selectedMachine.data = response.data;
+              this.checkMachineStatus()
               this.refreshMetrics()
             }
           },
@@ -211,6 +213,8 @@ export class DashboardComponent {
     const startParameter = encodeURIComponent(userId);
     return `https://t.me/ControlPanelServiceBot?start=${startParameter}`;
   }
+
+
   refreshMetrics() {
 
     forkJoin([

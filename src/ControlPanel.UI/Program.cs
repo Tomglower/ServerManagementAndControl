@@ -52,11 +52,11 @@ try
 {
     var dbContext = app.Services.CreateScope().ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
-    logger.LogDebug("Миграции применены успешно");
+    logger.LogInformation("РњРёРіСЂР°С†РёРё СѓСЃРїРµС€РЅРѕ РїСЂРёРјРµРЅРµРЅС‹");
 }
 catch (Exception ex)
 {
-   logger.LogError("Произошла ошибка при миграции базы данных: " + ex.Message);
+   logger.LogError("РћС€РёР±РєР° РїСЂРёРјРµРЅРµРЅРёСЏ РјРёРіСЂР°С†РёР№: " + ex.Message);
     return;
 }
 
