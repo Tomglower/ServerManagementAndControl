@@ -3,12 +3,7 @@ using ControlPanel.Core.Models;
 using ControlPanel.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
-using System.Reflection.PortableExecutable;
-using System.Security.Claims;
-using System.Text;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace ControlPanel.UI.Controllers
@@ -17,25 +12,36 @@ namespace ControlPanel.UI.Controllers
     [ApiController]
     public class PrometheusController : ControllerBase
     {
-
         private readonly PrometheusExporter _prometheusExporter;
-        public PrometheusController(PrometheusExporter prometheusExporter)
-        {
+        private readonly ILogger<PrometheusController> _logger;
 
+        public PrometheusController(PrometheusExporter prometheusExporter, ILogger<PrometheusController> logger)
+        {
             _prometheusExporter = prometheusExporter;
+            _logger = logger;
         }
 
-       
         [HttpPost]
         [Authorize]
         [Route("GetMetricsPrometheus")]
         public async Task<IActionResult> GetMetricsPrometheus([FromBody] MachineQueryRequest request)
         {
-            var prometheusResponse = await _prometheusExporter.GetMetricsPrometheusAsync(request);
+            _logger.LogInformation("Received request to fetch Prometheus metrics for machine: {MachineId}", request.Link);
 
-            return Ok(prometheusResponse);
+            try
+            {
+                var prometheusResponse = await _prometheusExporter.GetMetricsPrometheusAsync(request);
+                
+                _logger.LogInformation("Successfully fetched Prometheus metrics for machine: {MachineId}",  request.Link);
+
+                return Ok(prometheusResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching Prometheus metrics for machine: {MachineId}",  request.Link);
+                
+                return StatusCode(500, new { Message = "An error occurred while fetching metrics" });
+            }
         }
-        
     }
-
 }

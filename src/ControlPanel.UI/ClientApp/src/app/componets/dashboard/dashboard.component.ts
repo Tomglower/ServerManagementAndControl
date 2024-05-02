@@ -126,9 +126,8 @@ export class DashboardComponent {
         })
         .subscribe(
           (response: any) => {
-            console.log('API response:', response);
             machine.isActive = response;
-            this.cdr.detectChanges(); // Принудительно обновляем представление
+            this.cdr.detectChanges();
           },
           (error) => {
             this.OpenSnackBar(`Ошибка при проверке статуса: ${error.message}`, 'Close');
