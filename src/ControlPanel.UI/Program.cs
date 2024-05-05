@@ -64,13 +64,11 @@ app.UseCors("MyPolicy");
 
 app.UseAuthentication();
 
-
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();
 

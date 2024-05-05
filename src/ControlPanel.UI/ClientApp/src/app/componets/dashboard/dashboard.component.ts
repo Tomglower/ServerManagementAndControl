@@ -11,6 +11,8 @@ import ValidateForm from 'src/app/helpers/validateForm';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from 'oidc-client';
 import { ChangeDetectorRef } from '@angular/core';
+import {CustomMetricDialogComponent} from "../custom-metric-dialog/custom-metric-dialog.component";
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -25,6 +27,8 @@ export class DashboardComponent {
   metricsData: any;
   machines: Machine[] = [];
   selectedMachine: Machine | null = null;
+  userMetricInput: string = '';
+  userMetricResult: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +38,9 @@ export class DashboardComponent {
     private getMetricsService: GetMetricsService,
     private auth: AuthService,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
+
   ) { }
 
   ngOnInit(): void {
@@ -67,6 +73,16 @@ export class DashboardComponent {
 
   logout() {
     this.auth.signOut();
+  }
+
+  openCustomMetricDialog() {
+    this.dialog.open(CustomMetricDialogComponent, {
+      data: {
+        getMetric: (query: string) => {
+          return this.getMetr(query); // пример использования вашего метода для получения метрики
+        }
+      }
+    });
   }
 
   onButtonClick(): void {
@@ -165,9 +181,6 @@ export class DashboardComponent {
               this.checkMachineStatus()
               this.refreshMetrics()
             }
-          },
-          (error) => {
-            this.OpenSnackBar(`Ошибка при обновлении данных машины: ${error}`,'Close');
           }
         );
     }

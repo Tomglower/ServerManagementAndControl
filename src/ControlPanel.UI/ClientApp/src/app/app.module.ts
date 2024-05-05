@@ -20,12 +20,15 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import {CustomMetricDialogComponent} from "./componets/custom-metric-dialog/custom-metric-dialog.component";
+import {MatDialogModule} from "@angular/material/dialog";
 @NgModule({
   declarations: [
     AppComponent,
     SignupComponent,
     DashboardComponent,
-    LoginComponent
+    LoginComponent,
+    CustomMetricDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +47,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatListModule,
     MatMenuModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

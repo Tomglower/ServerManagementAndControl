@@ -47,7 +47,11 @@
     </div>
     <div class="col-md-8">
       <div *ngIf="selectedMachine">
-        <button mat-raised-button color="primary" (click)="updateMachineData()">Обновить данные</button>
+
+        <button mat-raised-button color="primary" (click)="updateMachineData()" style="margin-right: 10px;">Обновить данные</button>
+        <button mat-raised-button color="primary" (click)="openCustomMetricDialog()">Пользовательская метрика</button>
+
+
         <mat-card>
           <h3>Детали машины</h3>
 
