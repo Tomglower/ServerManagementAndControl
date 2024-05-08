@@ -105,15 +105,22 @@
 
           <mat-divider></mat-divider>
 
-          <div *ngFor="let metric of customMetrics" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>{{ metric.name }}:</span>
-            <span>{{ metric.value }}</span>
-            <button mat-icon-button color="warn" (click)="removeCustomMetric(metric.id)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+          <!-- Цикл для отображения каждой пользовательской метрики -->
+          <div *ngFor="let metric of customMetrics">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>
+        <!-- Использование иконок для согласованности -->
+        <mat-icon>show_chart</mat-icon>
+        {{ metric.name }}:
+      </span>
+              <span>{{ metric.value }}</span>
+              <button mat-icon-button color="warn" (click)="removeCustomMetric(metric.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
 
-          <mat-divider></mat-divider>
+            <mat-divider></mat-divider> <!-- Разделитель между метриками -->
+          </div>
         </mat-card>
       </div>
     </div>
