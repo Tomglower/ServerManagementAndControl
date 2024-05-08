@@ -1,0 +1,31 @@
+<!-- Карточка для диалога -->
+<mat-card class="dialog-card" style="max-width: 600px; margin: 0 auto;">
+  <h2 style="text-align: center;">Добавить пользовательскую метрику</h2>
+
+  <!-- Форма для ввода метрики -->
+  <form [formGroup]="metricForm">
+    <mat-form-field class="full-width" style="width: 100%;">
+      <mat-label>Название метрики</mat-label>
+      <input matInput formControlName="metricName" placeholder="Введите название метрики">
+      <!-- Сообщение об ошибке при отсутствии названия -->
+      <mat-error *ngIf="metricForm.controls['metricName'].hasError('required')">
+        Название метрики обязательно
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width" style="width: 100%;">
+      <mat-label>Запрос метрики</mat-label>
+      <input matInput formControlName="metricQuery" placeholder="Введите запрос метрики">
+      <!-- Сообщение об ошибке при отсутствии запроса -->
+      <mat-error *ngIf="metricForm.controls['metricQuery'].hasError('required')">
+        Запрос метрики обязателен
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Кнопки диалога -->
+    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+      <button mat-button (click)="onCancel()">Отмена</button>
+      <button mat-raised-button color="primary" (click)="onAddMetric()">Добавить</button>
+    </div>
+  </form>
+</mat-card>

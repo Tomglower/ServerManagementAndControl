@@ -6,51 +6,50 @@
   <button mat-raised-button color="warn" (click)="logout()">Выход</button>
 </mat-toolbar>
 
-
 <div class="container">
   <div class="row">
     <div class="col-md-4">
-      <form [formGroup]="dashboardForm" >
+      <form [formGroup]="dashboardForm">
         <mat-card>
           <mat-form-field class="full-width">
-            <mat-label>address</mat-label>
+            <mat-label>Адрес</mat-label>
             <input matInput formControlName="Link" placeholder="Введите адрес виртуальной машины" pattern="^(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$" required>
-
-            <mat-error *ngIf="dashboardForm.controls['Link'].errors && dashboardForm.controls['Link'].errors.pattern">
+            <mat-error *ngIf="dashboardForm.controls['Link'].hasError('pattern')">
               Введите действительный IP-адрес
             </mat-error>
           </mat-form-field>
           <button mat-raised-button (click)="onButtonClick()" color="primary" type="submit">Добавить машину</button>
         </mat-card>
-
       </form>
-        <div class="mt-4">
-          <h3>Список машин</h3>
-          <mat-list>
-            <mat-list-item *ngFor="let machine of machines"
-                           (click)="showMachineDetails(machine)"
-                           [ngClass]="{'selected-list-item': machine === selectedMachine}"
-                           class="border">
-              <a (click)="$event.stopPropagation()">{{ machine.link }}</a>
-              <mat-icon [ngStyle]="{ color: machine.isActive ? '#4CAF50' : '#F44336', 'font-size': '16px', 'border-radius': '50%' }">
-                lens
-              </mat-icon>
-              <button mat-button [matMenuTriggerFor]="menu" class="menu-button"><mat-icon>more_vert</mat-icon></button>
-              <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="deleteMachine(machine); $event.stopPropagation()">Удалить</button>
-                <button mat-menu-item (click)="openMachineServer(machine.link); $event.stopPropagation()">Открыть сервер</button>
-              </mat-menu>
-            </mat-list-item>
-          </mat-list>
 
-        </div>
+      <div class="mt-4">
+        <h3>Список машин</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let machine of machines"
+                         (click)="showMachineDetails(machine)"
+                         [ngClass]="{'selected-list-item': machine === selectedMachine}"
+                         class="border">
+            <a (click)="$event.stopPropagation()">{{ machine.link }}</a>
+            <mat-icon [ngStyle]="{ color: machine.isActive ? '#4CAF50' : '#F44336', 'font-size': '16px', 'border-radius': '50%' }">
+              lens
+            </mat-icon>
+            <button mat-button [matMenuTriggerFor]="menu" class="menu-button">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="deleteMachine(machine); $event.stopPropagation()">Удалить</button>
+              <button mat-menu-item (click)="openMachineServer(machine.link); $event.stopPropagation()">Открыть сервер</button>
+            </mat-menu>
+          </mat-list-item>
+        </mat-list>
+      </div>
     </div>
+
     <div class="col-md-8">
       <div *ngIf="selectedMachine">
-
         <button mat-raised-button color="primary" (click)="updateMachineData()" style="margin-right: 10px;">Обновить данные</button>
-        <button mat-raised-button color="primary" (click)="openCustomMetricDialog()">Пользовательская метрика</button>
-
+        <button mat-raised-button color="primary" (click)="openCustomMetricDialog()" style="margin-right: 10px;">Пользовательская метрика</button>
+        <button mat-raised-button color="primary" (click)="openCustomAddMetricDialog()">Добавление отслеживаемых метрик</button>
 
         <mat-card>
           <h3>Детали машины</h3>
@@ -100,15 +99,37 @@
           <mat-divider></mat-divider>
         </mat-card>
 
+        <!-- Отображение пользовательских метрик -->
+        <mat-card *ngIf="customMetrics.length > 0">
+          <h3>Пользовательские метрики</h3>
 
+          <mat-divider></mat-divider>
+
+          <!-- Цикл для отображения каждой пользовательской метрики -->
+          <div *ngFor="let metric of customMetrics">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>
+        <!-- Использование иконок для согласованности -->
+        <mat-icon>show_chart</mat-icon>
+        {{ metric.name }}:
+      </span>
+              <span>{{ metric.value }}</span>
+              <button mat-icon-button color="warn" (click)="removeCustomMetric(metric.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+            <mat-divider></mat-divider> <!-- Разделитель между метриками -->
+          </div>
+        </mat-card>
       </div>
     </div>
   </div>
 </div>
+
 <div class="footer">
   <a [href]="getBotLink()" target="_blank">
     Перейти в телеграмм бота
-
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/768px-Telegram_logo.svg.png" alt="Telegram" width="30" height="30"/>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/768px-Telegram_logo.svg.png" width="30" height="30"/>
   </a>
 </div>

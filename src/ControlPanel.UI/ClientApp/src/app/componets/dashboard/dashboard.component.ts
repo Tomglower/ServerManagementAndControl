@@ -13,6 +13,8 @@ import { User } from 'oidc-client';
 import { ChangeDetectorRef } from '@angular/core';
 import {CustomMetricDialogComponent} from "../custom-metric-dialog/custom-metric-dialog.component";
 import { MatDialog } from '@angular/material/dialog';
+import CustomMetric from "../../helpers/CustomMetric";
+import {CustomMetricAddDialogComponent} from "../custom-metric-add-dialog/custom-metric-add-dialog.component";
 
 
 @Component({
@@ -30,6 +32,11 @@ export class DashboardComponent {
   userMetricInput: string = '';
   userMetricResult: number | null = null;
 
+  customMetricName = '';
+  customMetricQuery = '';
+  customMetrics: CustomMetric[] = [];
+
+
   constructor(
     private fb: FormBuilder,
     private dashboardService: DashboardService,
@@ -46,9 +53,11 @@ export class DashboardComponent {
   ngOnInit(): void {
     this.auth.autoLogin();
     this.loadMachines();
+    this.loadCustomMetrics();
     setInterval(() => {
       this.updateMachineData();
       this.loadMachines();
+      this.refreshCustomMetrics();
     }, 5000);
     this.dashboardForm = this.fb.group({
       Link: ['', Validators.required],
@@ -259,6 +268,91 @@ export class DashboardComponent {
         this.OpenSnackBar(`Ошибка при получении метрик: error`,'Close');
       }
     );
+  }
+  addCustomMetric(): void {
+    if (this.selectedMachine && this.customMetricName && this.customMetricQuery) {
+      const newMetric: CustomMetric = {
+        id: new Date().toISOString(), // уникальный идентификатор метрики
+        name: this.customMetricName,
+        query: this.customMetricQuery,
+        machineId: this.selectedMachine.id,
+        value: null,
+      };
+
+      this.customMetrics.push(newMetric);
+      this.saveCustomMetrics(); // сохранить в Local Storage
+      this.customMetricName = ''; // очистить поле ввода
+      this.customMetricQuery = '';
+      this.refreshCustomMetrics(); // сразу обновить значения метрик
+    }
+  }
+
+  removeCustomMetric(metricId: string): void {
+    this.customMetrics = this.customMetrics.filter(metric => metric.id !== metricId);
+    this.saveCustomMetrics();
+  }
+
+  saveCustomMetrics(): void {
+    localStorage.setItem('CustomMetrics', JSON.stringify(this.customMetrics));
+  }
+
+  loadCustomMetrics(): void {
+    const savedMetrics = localStorage.getItem('CustomMetrics');
+    if (savedMetrics) {
+      this.customMetrics = JSON.parse(savedMetrics);
+    }
+  }
+
+  refreshCustomMetrics(): void {
+    const metricObservables = this.customMetrics.map(metric => {
+      return this.getMetr(metric.query).pipe(
+        map(value => {
+          metric.value = value;
+          return metric;
+        })
+      );
+    });
+
+    forkJoin(metricObservables).subscribe(
+      () => {
+        this.saveCustomMetrics(); // обновить сохраненные значения
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        this.openSnackBar(`Ошибка при обновлении пользовательских метрик: ${error}`, 'Close');
+      }
+    );
+  }
+
+  openSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 3000,
+      verticalPosition: "top",
+      horizontalPosition: "center"
+    });
+  }
+
+  openCustomAddMetricDialog() {
+    const dialogRef = this.dialog.open(CustomMetricAddDialogComponent, {
+      width: '400px',
+      data: {} // можем передать данные, если нужно
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && this.selectedMachine) {
+        const newMetric = {
+          id: new Date().toISOString(), // уникальный ID метрики
+          name: result.metricName,
+          query: result.metricQuery,
+          machineId: this.selectedMachine.id,
+          value: null,
+        };
+
+        this.customMetrics.push(newMetric);
+        this.saveCustomMetrics(); // сохранить в Local Storage
+        this.refreshCustomMetrics(); // обновить метрики после добавления
+      }
+    });
   }
 }
 

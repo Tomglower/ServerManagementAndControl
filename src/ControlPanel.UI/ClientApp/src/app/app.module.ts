@@ -22,13 +22,15 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {CustomMetricDialogComponent} from "./componets/custom-metric-dialog/custom-metric-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
+import {CustomMetricAddDialogComponent} from "./componets/custom-metric-add-dialog/custom-metric-add-dialog.component";
 @NgModule({
   declarations: [
     AppComponent,
     SignupComponent,
     DashboardComponent,
     LoginComponent,
-    CustomMetricDialogComponent
+    CustomMetricDialogComponent,
+    CustomMetricAddDialogComponent
   ],
   imports: [
     BrowserModule,
