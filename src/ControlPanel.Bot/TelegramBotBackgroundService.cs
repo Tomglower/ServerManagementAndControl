@@ -55,88 +55,13 @@ public class TelegramBotBackgroundService : BackgroundService
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
     
-    // private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
-    //     CancellationToken cancellationToken)
-    // {
-    //     string id = null;
-    //     if (update.Type == UpdateType.Message && update.Message!.Type == MessageType.Text)
-    //     {
-    //         var chatId = update.Message.Chat.Id;
-    //         var messageText = update.Message.Text;
-    //
-    //         _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
-    //
-    //         if (messageText.StartsWith("/start"))
-    //         {
-    //             var commandParts = messageText.Split(' ');
-    //
-    //             if (commandParts.Length > 1)
-    //             {
-    //                 id = commandParts[1];
-    //
-    //                 await botClient.SendTextMessageAsync(chatId, $"Привет! Ваш ID: {id}",
-    //                     cancellationToken: cancellationToken);
-    //                 
-    //             }
-    //             else
-    //             {
-    //                 await botClient.SendTextMessageAsync(chatId, "Привет! Как я могу помочь вам сегодня?",
-    //                     cancellationToken: cancellationToken);
-    //             }
-    //         }
-    //         else if (IPAddress.TryParse(messageText, out var ipAddress))
-    //         {
-    //             try
-    //             {
-    //                 var apiResponse = await GetApiResponse(ipAddress.ToString(), cancellationToken);
-    //                 await botClient.SendTextMessageAsync(chatId, apiResponse, cancellationToken: cancellationToken);
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
-    //                     cancellationToken: cancellationToken);
-    //                 _logger.LogError(ex, "Error calling the API.");
-    //             }
-    //         }
-    //         else
-    //         {
-    //             await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
-    //                 cancellationToken: cancellationToken);
-    //         }
-    //         if (messageText.StartsWith("/getserver"))
-    //         {
-    //             var userId = "1"; 
-    //
-    //             try
-    //             {
-    //                 var servers = await GetServersForUser(userId, cancellationToken);
-    //
-    //                 if (servers.Any())
-    //                 {
-    //                     var inlineKeyboard = new InlineKeyboardMarkup(servers.Select(server =>
-    //                         InlineKeyboardButton.WithCallbackData(server.Link,server.Link )).ToArray());
-    //
-    //                     await botClient.SendTextMessageAsync(chatId, "Выберите сервер:", replyMarkup: inlineKeyboard, cancellationToken: cancellationToken);
-    //                 }
-    //                 else
-    //                 {
-    //                     await botClient.SendTextMessageAsync(chatId, "Список серверов пуст.", cancellationToken: cancellationToken);
-    //                 }
-    //             }
-    //             catch (HttpRequestException ex)
-    //             {
-    //                 _logger.LogError(ex, "Ошибка при получении списка серверов.");
-    //                 await botClient.SendTextMessageAsync(chatId, "Ошибка при получении списка серверов.", cancellationToken: cancellationToken);
-    //             }
-    //         }
-    //        
-    //     }
-    // }
+    
     //TODO: подумать над сохранением id пользователя, добавления всех полей в ответ и парсинг всех запросов прометеуса 
     
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
+        
         string id = "1";
         var chatId = update.Message?.Chat.Id ?? update.CallbackQuery?.Message.Chat.Id;
 
@@ -154,7 +79,7 @@ public class TelegramBotBackgroundService : BackgroundService
                 {
                     id = commandParts[1];
     
-                    await botClient.SendTextMessageAsync(chatId, $"Привет! Ваш ID: {id}",
+                    await botClient.SendTextMessageAsync(chatId, $"Привет!",
                         cancellationToken: cancellationToken);
                     
                 }
@@ -164,21 +89,6 @@ public class TelegramBotBackgroundService : BackgroundService
                         cancellationToken: cancellationToken);
                 }
             }
-            // else if (IPAddress.TryParse(messageText, out var ipAddress))
-            // {
-            //     try
-            //     {
-            //         double loadValue = await GetLoadValueFromApiResponse(ipAddress.ToString(), cancellationToken);
-            //         await botClient.SendTextMessageAsync(chatId, loadValue.ToString("F2"), cancellationToken: cancellationToken);
-            //
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         await botClient.SendTextMessageAsync(chatId, "Произошла ошибка при обращении к API.",
-            //             cancellationToken: cancellationToken);
-            //         _logger.LogError(ex, "Error calling the API.");
-            //     }
-            // }
             else
             {
                 await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
