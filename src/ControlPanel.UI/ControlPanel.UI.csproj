@@ -20,6 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.OpenApi" Version="1.6.8" />
+    <PackageReference Include="Telegram.Bot" Version="20.0.0-alpha.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +36,11 @@
   <ItemGroup>
     <ProjectReference Include="..\ControlPanel.Core\ControlPanel.Core.csproj" />
     <ProjectReference Include="..\ControlPanel.Data\ControlPanel.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\services\Mediator\" />
+    <Folder Include="ClientApp\src\app\services\Notifmediator\" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

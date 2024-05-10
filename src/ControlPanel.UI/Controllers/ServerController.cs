@@ -6,7 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace ControlPanel.UI.Controllers
 {
@@ -16,11 +21,15 @@ namespace ControlPanel.UI.Controllers
     {
         private readonly ServerManager _serverManager;
         private readonly ILogger<ServerController> _logger;
-
-        public ServerController(ServerManager serverManager, ILogger<ServerController> logger)
+        private readonly string _telegramToken;
+        private readonly TelegramBotClient _telegramBotClient;
+        
+        public ServerController(ServerManager serverManager, ILogger<ServerController> logger,IConfiguration configuration)
         {
             _serverManager = serverManager;
             _logger = logger;
+            var telegramToken = configuration["TelegramToken"];
+            _telegramBotClient = new TelegramBotClient(telegramToken);
         }
 
         [HttpPost]
@@ -175,6 +184,37 @@ namespace ControlPanel.UI.Controllers
                     _logger.LogError(ex, "An error occurred while pinging link: {Link}", req.Link);
                     return false;
                 }
+            }
+        }
+        [HttpPost]
+        [Authorize]
+        [Route("SendMessage")]
+        public async Task<IActionResult> SendMessage([FromBody] MessageRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("SendMessage endpoint called with message: {Message}", request.Message);
+
+                if (string.IsNullOrWhiteSpace(request.Message))
+                {
+                    return BadRequest(new { Message = "Invalid message content." });
+                }
+
+                var chatId = new ChatId("449315724");  // Замените на ID чата/группы
+
+                // Отправка сообщения в Telegram с использованием TelegramBotClient
+                var sentMessage = await _telegramBotClient.SendTextMessageAsync(
+                    chatId,
+                    request.Message
+                );
+
+                _logger.LogInformation("Message sent successfully to Telegram with ID: {MessageId}", sentMessage.MessageId);
+                return Ok(new { Message = "Message sent to Telegram." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending message to Telegram.");
+                return StatusCode(500, new { Message = "Internal Server Error." });
             }
         }
     }
