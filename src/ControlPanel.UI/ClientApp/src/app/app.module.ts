@@ -23,6 +23,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import {CustomMetricDialogComponent} from "./componets/custom-metric-dialog/custom-metric-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
 import {CustomMetricAddDialogComponent} from "./componets/custom-metric-add-dialog/custom-metric-add-dialog.component";
+import {NotificationSettingsComponent} from "./componets/notification-settings/notification-settings.component";
+import {MatSelectModule} from "@angular/material/select";
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,7 +32,8 @@ import {CustomMetricAddDialogComponent} from "./componets/custom-metric-add-dial
     DashboardComponent,
     LoginComponent,
     CustomMetricDialogComponent,
-    CustomMetricAddDialogComponent
+    CustomMetricAddDialogComponent,
+    NotificationSettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -50,7 +53,8 @@ import {CustomMetricAddDialogComponent} from "./componets/custom-metric-add-dial
     MatMenuModule,
     MatSnackBarModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

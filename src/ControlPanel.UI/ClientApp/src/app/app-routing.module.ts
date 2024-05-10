@@ -4,13 +4,15 @@ import { LoginComponent } from './componets/login/login.component';
 import { SignupComponent } from './componets/signup/signup.component';
 import { DashboardComponent } from './componets/dashboard/dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
+import {NotificationSettingsComponent} from "./componets/notification-settings/notification-settings.component";
 
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {path:'login',component: LoginComponent},
   {path:'signup',component:SignupComponent},
-  {path:'dashboard',component:DashboardComponent,canActivate:[AuthGuard]}
+  {path:'dashboard',component:DashboardComponent,canActivate:[AuthGuard]},
+  { path: 'notification-settings', component: NotificationSettingsComponent },
 
 
 ];
