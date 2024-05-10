@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import Machine from 'src/app/helpers/Machine';
 import {forkJoin, interval, of} from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import CustomMetric from "../../helpers/CustomMetric";
 
 interface NotificationSetting {
   machine: Machine;
@@ -25,16 +26,16 @@ export class NotificationSettingsComponent implements OnInit {
   threshold!: number;
   notificationInterval!: number; // Новый параметр интервала
   availableMetrics: string[] = [
-    'CPU Usage',
-    'Memory Usage',
-    'Disk Usage',
-    'Network Transmit',
-    'Network Receive'
+    'Использование CPU',
+    'Использование памяти',
+    'Использование диска',
+    'Передача данных по сети',
+    'Получение данных по сети'
   ];
 
   notificationSettings: NotificationSetting[] = [];
   machines: Machine[] = [];
-
+  customMetrics: CustomMetric[] = [];
   constructor(
     private snackBar: MatSnackBar,
     private http: HttpClient,
@@ -44,9 +45,23 @@ export class NotificationSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.loadMachines();
     this.loadNotificationSettings();
+    this.loadCustomMetrics();
     this.startMonitoring();
   }
 
+  getAvailableMetrics(): string[] {
+    const baseMetrics = [
+      'Использование CPU',
+      'Использование памяти',
+      'Использование диска',
+      'Передача данных по сети',
+      'Получение данных по сети'
+    ];
+
+    const customMetricNames = this.customMetrics.map(metric => metric.name);
+
+    return [...baseMetrics, ...customMetricNames];
+  }
   loadMachines() {
     const userId = localStorage.getItem('UserId');
     const requestObject = { UserId: userId };
@@ -67,6 +82,12 @@ export class NotificationSettingsComponent implements OnInit {
       );
   }
 
+  loadCustomMetrics(): void {
+    const savedMetrics = localStorage.getItem('CustomMetrics');
+    if (savedMetrics) {
+      this.customMetrics = JSON.parse(savedMetrics);
+    }
+  }
   saveNotificationSetting() {
     const newSetting: NotificationSetting = {
       machine: this.selectedMachine,
@@ -89,6 +110,15 @@ export class NotificationSettingsComponent implements OnInit {
       s => s !== setting
     );
     this.saveNotificationSettings();
+  }
+
+  logout() {
+    this.authService.signOut();
+  }
+  getBotLink(): string {
+    const userId = localStorage.getItem('UserId') || '';
+    const startParameter = encodeURIComponent(userId);
+    return `https://t.me/ControlPanelServiceBot?start=${startParameter}`;
   }
 
   saveNotificationSettings() {
@@ -138,27 +168,34 @@ export class NotificationSettingsComponent implements OnInit {
   }
 
   getMetric(machineLink: string, metric: string) {
-    let query = '';
-    switch (metric) {
-      case 'CPU Usage':
-        query = '100 - (avg without(mode)(irate(node_cpu_seconds_total[1m])) * 100)';
-        break;
-      case 'Memory Usage':
-        query = '(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024 / 1024';
-        break;
-      case 'Disk Usage':
-        query = '(sum(node_filesystem_size_bytes - node_filesystem_free_bytes) by (instance)) / 1073741824';
-        break;
-      case 'Network Transmit':
-        query = 'irate(node_network_transmit_bytes_total[5m])';
-        break;
-      case 'Network Receive':
-        query = 'irate(node_network_receive_bytes_total[5m])';
-        break;
+    // Сначала ищем в пользовательских метриках
+    const customMetric = this.customMetrics.find(m => m.name === metric);
+
+    if (customMetric) {
+      return this.http
+        .post<any>('http://localhost:5143/Prometheus/GetMetricsPrometheus', { link: machineLink, query: customMetric.query }, {
+          headers: {
+            'Authorization': `Bearer ${this.authService.getToken()}`
+          }
+        })
+        .pipe(
+          map(response => {
+            const result = response.data.result[0];
+            if (result && result.value && result.value[1]) {
+              return parseFloat(result.value[1]);
+            }
+            return 0;
+          }),
+          catchError((error) => {
+            this.snackBar.open(`Ошибка при получении метрики: ${error}`, 'Close');
+            return of(0);
+          })
+        );
     }
 
+    // Если метрика не найдена в пользовательских, используем стандартные
     return this.http
-      .post<any>('http://localhost:5143/Prometheus/GetMetricsPrometheus', { link: machineLink, query }, {
+      .post<any>('http://localhost:5143/Prometheus/GetMetricsPrometheus', { link: machineLink, query: this.getStandardMetricQuery(metric) }, {
         headers: {
           'Authorization': `Bearer ${this.authService.getToken()}`
         }
@@ -177,6 +214,24 @@ export class NotificationSettingsComponent implements OnInit {
         })
       );
   }
+
+  getStandardMetricQuery(metric: string): string {
+    switch (metric) {
+      case 'Использование CPU':
+        return '100 - (avg without(mode)(irate(node_cpu_seconds_total[1m])) * 100)';
+      case 'Использование памяти':
+        return '(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024 / 1024';
+      case 'Использование диска':
+        return '(sum(node_filesystem_size_bytes - node_filesystem_free_bytes) by (instance)) / 1073741824';
+      case 'Передача данных по сети':
+        return 'irate(node_network_transmit_bytes_total[5m])';
+      case 'Получение данных по сети':
+        return 'irate(node_network_receive_bytes_total[5m])';
+      default:
+        return ''; // Если метрика неизвестна
+    }
+  }
+
 
   sendTelegramNotification(machine: Machine, metric: string, threshold: number, actualValue: number) {
     const message = `Уведомление: Метрика '${metric}' на машине '${machine.link}' превысила пороговое значение (${threshold}): фактическое значение ${actualValue}`;

@@ -1,43 +1,72 @@
-<div class="notification-settings">
-  <h2>Настройки уведомлений</h2>
+<mat-toolbar color="primary">
+  <span>ServerManagerAndControl</span>
+  <span class="spacer"></span>
+  <a routerLink="/dashboard">Dashboard</a>
+  <span class="spacer"></span>
+  <a routerLink="/notification-settings">Настройки уведомлений</a>
+  <span class="spacer"></span>
+  <button mat-raised-button color="warn" (click)="logout()">Выход</button>
+</mat-toolbar>
 
-  <mat-form-field class="full-width">
-    <mat-label>Выберите машину</mat-label>
-    <mat-select [(ngModel)]="selectedMachine" required>
-      <mat-option *ngFor="let machine of machines" [value]="machine">
-        {{ machine.link }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+<div class="container">
+  <div class="notification-settings">
+    <h2>Настройки уведомлений</h2>
 
-  <mat-form-field class="full-width">
-    <mat-label>Выберите метрику</mat-label>
-    <mat-select [(ngModel)]="selectedMetric" required>
-      <mat-option *ngFor="let metric of availableMetrics" [value]="metric">
-        {{ metric }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-card>
+      <mat-form-field class="full-width">
+        <mat-label>Выберите машину</mat-label>
+        <mat-select [(ngModel)]="selectedMachine" required>
+          <mat-option *ngFor="let machine of machines" [value]="machine">
+            {{ machine.link }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-  <mat-form-field class="full-width">
-    <mat-label>Предельное значение</mat-label>
-    <input matInput [(ngModel)]="threshold" type="number" required>
-  </mat-form-field>
+      <mat-form-field class="full-width">
+        <mat-label>Выберите метрику</mat-label>
+        <mat-select [(ngModel)]="selectedMetric" required name="metric">
+          <mat-option *ngFor="let metric of getAvailableMetrics()" [value]="metric">
+            {{ metric }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-  <mat-form-field class="full-width">
-    <mat-label>Интервал уведомления (секунды)</mat-label>
-    <input matInput [(ngModel)]="notificationInterval" type="number" required>
-  </mat-form-field>
 
-  <button mat-raised-button (click)="saveNotificationSetting()" color="primary">
-    Сохранить
-  </button>
+      <mat-form-field class="full-width">
+        <mat-label>Предельное значение</mat-label>
+        <input matInput [(ngModel)]="threshold" type="number" required>
+      </mat-form-field>
 
-  <h3>Текущие настройки уведомлений</h3>
-  <mat-list>
-    <mat-list-item *ngFor="let setting of notificationSettings">
-      Машина: {{ setting.machine.link }}, Метрика: {{ setting.metric }}, Предел: {{ setting.threshold }}, Интервал: {{ setting.interval }} сек.
-      <button mat-button (click)="removeNotificationSetting(setting)">Удалить</button>
-    </mat-list-item>
-  </mat-list>
+      <mat-form-field class="full-width">
+        <mat-label>Интервал уведомления (секунды)</mat-label>
+        <input matInput [(ngModel)]="notificationInterval" type="number" required>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="saveNotificationSetting()">
+        Сохранить
+      </button>
+    </mat-card>
+
+    <mat-card class="mt-4">
+      <h3>Текущие настройки уведомлений</h3>
+
+      <mat-list>
+        <mat-list-item *ngFor="let setting of notificationSettings" class="border">
+          <span>
+            Машина: {{ setting.machine.link }}, Метрика: {{ setting.metric }}, Предел: {{ setting.threshold }}, Интервал: {{ setting.interval }} сек.
+          </span>
+          <button mat-icon-button color="warn" (click)="removeNotificationSetting(setting)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </mat-card>
+  </div>
+</div>
+
+<div class="footer">
+  <a [href]="getBotLink()" target="_blank">
+    Перейти в телеграмм бота
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/768px-Telegram_logo.svg.png" width="30" height="30"/>
+  </a>
 </div>
