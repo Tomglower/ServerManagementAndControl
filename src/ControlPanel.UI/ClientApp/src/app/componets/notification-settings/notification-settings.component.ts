@@ -3,7 +3,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import Machine from 'src/app/helpers/Machine';
-import CustomMetric from 'src/app/helpers/CustomMetric';
 import {forkJoin, interval, of} from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -11,6 +10,8 @@ interface NotificationSetting {
   machine: Machine;
   metric: string;
   threshold: number;
+  interval: number; // Новый параметр для интервала
+  lastNotificationTimestamp?: number; // Для отслеживания последнего уведомления
 }
 
 @Component({
@@ -22,6 +23,7 @@ export class NotificationSettingsComponent implements OnInit {
   selectedMachine!: Machine;
   selectedMetric!: string;
   threshold!: number;
+  notificationInterval!: number; // Новый параметр интервала
   availableMetrics: string[] = [
     'CPU Usage',
     'Memory Usage',
@@ -69,7 +71,8 @@ export class NotificationSettingsComponent implements OnInit {
     const newSetting: NotificationSetting = {
       machine: this.selectedMachine,
       metric: this.selectedMetric,
-      threshold: this.threshold
+      threshold: this.threshold,
+      interval: this.notificationInterval,
     };
 
     this.notificationSettings.push(newSetting);
@@ -106,23 +109,32 @@ export class NotificationSettingsComponent implements OnInit {
   }
 
   monitorMetrics() {
-    const metricObservables = this.notificationSettings.map(setting => {
-      return this.getMetric(setting.machine.link, setting.metric).pipe(
+    const now = new Date().getTime(); // Текущее время в миллисекундах
+
+    this.notificationSettings.forEach(setting => {
+      if (
+        setting.lastNotificationTimestamp &&
+        (now - setting.lastNotificationTimestamp) / 1000 < setting.interval
+      ) {
+        // Если прошло меньше времени, чем указанный интервал, пропустить
+        return;
+      }
+
+      this.getMetric(setting.machine.link, setting.metric).pipe(
         map(value => {
           if (value >= setting.threshold) {
             this.sendTelegramNotification(setting.machine, setting.metric, setting.threshold, value);
+            setting.lastNotificationTimestamp = now; // Обновить время последнего уведомления
           }
           return value;
         })
+      ).subscribe(
+        () => {},
+        (error) => {
+          this.snackBar.open(`Ошибка при мониторинге: ${error}`, 'Close');
+        }
       );
     });
-
-    forkJoin(metricObservables).subscribe(
-      () => {},
-      (error) => {
-        this.snackBar.open(`Ошибка при мониторинге: ${error}`, 'Close');
-      }
-    );
   }
 
   getMetric(machineLink: string, metric: string) {
