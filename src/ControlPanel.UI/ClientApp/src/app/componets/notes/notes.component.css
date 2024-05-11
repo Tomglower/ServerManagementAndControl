@@ -45,3 +45,16 @@
 .footer a {
   color: white;
 }
+.delete-button {
+  font-size: 16px; /* Уменьшаем размер иконки */
+}
+
+.list-group-item {
+  display: flex; /* Размещаем элементы в строку */
+  justify-content: space-between; /* Распределяем элементы по ширине */
+  align-items: center; /* Выравниваем элементы по вертикали */
+}
+
+.list-group-item span {
+  margin-right: 10px; /* Добавляем отступ справа от текста */
+}

@@ -16,7 +16,7 @@ export class AuthService {
   signUp(userObj:any){
     return this.http.post<any>(`${this.baseUrl}registration`,userObj)
   }
-  
+
   login(loginObj:any){
     return this.http.post<any>(`${this.baseUrl}auth`,loginObj
     )
@@ -29,7 +29,7 @@ export class AuthService {
   storeToken(tokenValue: string){
     localStorage.setItem('token',tokenValue)
   }
-  
+
   getToken(){
     return localStorage.getItem('token')
   }
@@ -39,7 +39,8 @@ export class AuthService {
   }
 
   signOut(){
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('UserId');
     this.router.navigate(['login'])
   }
   storeId(idValue: string) {
@@ -73,9 +74,9 @@ export class AuthService {
     }
   }
 
- 
 
 
 
-  
+
+
 }

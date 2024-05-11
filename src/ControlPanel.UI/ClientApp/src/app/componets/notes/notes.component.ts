@@ -68,6 +68,14 @@ export class NotesComponent implements OnInit {
     }
   }
 
+  deleteNote(note: Note): void {
+    const index = this.notes.indexOf(note);
+    if (index !== -1) {
+      this.notes.splice(index, 1);
+      this.saveNotes();
+    }
+  }
+
   getBotLink(): string {
     const userId = localStorage.getItem('UserId') || '';
     const startParameter = encodeURIComponent(userId);
