@@ -1,0 +1,47 @@
+<mat-toolbar color="primary">
+  <span>ServerManagerAndControl</span>
+  <span class="spacer"></span>
+  <a routerLink="/dashboard">Дэшборд</a>
+  <span class="spacer"></span>
+  <a routerLink="/notification-settings">Уведомления</a>
+  <span class="spacer"></span>
+  <a routerLink="/notes">Заметки</a>
+  <span class="spacer"></span>
+  <button mat-raised-button color="warn" (click)="logout()">Выход</button>
+</mat-toolbar>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Список заметок</h3>
+      <div class="list-group">
+        <!-- Здесь будет список заметок -->
+        <button *ngFor="let note of notes" class="list-group-item list-group-item-action" (click)="selectNote(note)">
+          {{ note.title }}
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <h3>{{ selectedNote?.title || 'Выберите заметку' }}</h3>
+      <div *ngIf="selectedNote">
+        <!-- Форма для отображения выбранной заметки -->
+        <input type="text" class="form-control mb-2" placeholder="Введите название заметки" [(ngModel)]="selectedNote.title">
+        <textarea class="form-control" rows="10" placeholder="Введите текст заметки" [(ngModel)]="selectedNote.content"></textarea>
+        <button class="btn btn-primary mt-2" (click)="saveNote()">Сохранить</button>
+      </div>
+      <div *ngIf="!selectedNote">
+        <!-- Форма для создания новой заметки -->
+        <input type="text" class="form-control mb-2" placeholder="Введите название заметки" [(ngModel)]="newNoteTitle">
+        <textarea class="form-control" rows="10" placeholder="Введите текст заметки" [(ngModel)]="newNoteContent"></textarea>
+        <button class="btn btn-primary mt-2" (click)="saveNewNote()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <a [href]="getBotLink()" target="_blank">
+    Перейти в телеграмм бота
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/768px-Telegram_logo.svg.png" width="30" height="30"/>
+  </a>
+</div>

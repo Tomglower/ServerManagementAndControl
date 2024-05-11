@@ -39,8 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\src\app\services\Mediator\" />
-    <Folder Include="ClientApp\src\app\services\Notifmediator\" />
+    <Folder Include="ClientApp\src\app\services\note\" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -25,6 +25,7 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {CustomMetricAddDialogComponent} from "./componets/custom-metric-add-dialog/custom-metric-add-dialog.component";
 import {NotificationSettingsComponent} from "./componets/notification-settings/notification-settings.component";
 import {MatSelectModule} from "@angular/material/select";
+import {NotesComponent} from "./componets/notes/notes.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,7 +34,8 @@ import {MatSelectModule} from "@angular/material/select";
     LoginComponent,
     CustomMetricDialogComponent,
     CustomMetricAddDialogComponent,
-    NotificationSettingsComponent
+    NotificationSettingsComponent,
+    NotesComponent
   ],
   imports: [
     BrowserModule,

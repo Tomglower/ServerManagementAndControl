@@ -234,7 +234,7 @@ export class NotificationSettingsComponent implements OnInit {
 
 
   sendTelegramNotification(machine: Machine, metric: string, threshold: number, actualValue: number) {
-    const message = `Уведомление: Метрика '${metric}' на машине '${machine.link}' превысила пороговое значение (${threshold}): фактическое значение ${actualValue}`;
+    const message = `Уведомление: Метрика '${metric}' на машине '${machine.link}' превысила пороговое значение (${threshold}): фактическое значение ${actualValue.toFixed(2)}`;
 
     this.http.post(
       'http://localhost:5143/Server/SendMessage',

@@ -1,0 +1,47 @@
+.mat-toolbar {
+  background-color: #2f2fa2;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.btn {
+  margin-left: 10px;
+}
+
+.mat-toolbar a {
+  color: white;
+}
+
+.selected-list-item {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.list-group-item {
+  border: 1px solid #ccc;
+}
+
+.container {
+  margin-top: 20px;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #2f2fa2;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.footer a {
+  color: white;
+}
