@@ -6,14 +6,8 @@ import Machine from 'src/app/helpers/Machine';
 import {forkJoin, interval, of} from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import CustomMetric from "../../helpers/CustomMetric";
+import {NotificationSetting} from "../../helpers/NotificationSetting";
 
-interface NotificationSetting {
-  machine: Machine;
-  metric: string;
-  threshold: number;
-  interval: number; // Новый параметр для интервала
-  lastNotificationTimestamp?: number; // Для отслеживания последнего уведомления
-}
 
 @Component({
   selector: 'app-notification-settings',

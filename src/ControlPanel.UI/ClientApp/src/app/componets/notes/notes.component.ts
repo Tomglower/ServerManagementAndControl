@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import {Note} from "../../helpers/Note";
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-}
 
 @Component({
   selector: 'app-notes',
