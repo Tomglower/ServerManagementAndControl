@@ -47,10 +47,10 @@ onLogin(){
         this.router.navigate(['dashboard'])
       },
       error:(err)=>{
-        this.OpenSnackBar(err.error.message,'Close')
+        this.OpenSnackBar("Неверно введенные данные",'Close')
       }
     })
-    
+
 
   }else{
      ValidateForm.validateAllFormFields(this.loginForm)

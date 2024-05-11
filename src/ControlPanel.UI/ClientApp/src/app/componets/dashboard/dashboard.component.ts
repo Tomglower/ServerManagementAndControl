@@ -137,7 +137,8 @@ export class DashboardComponent {
           console.log(data)
         },
         (error) => {
-          this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`, 'Close');
+          //this.OpenSnackBar(`Ошибка при загрузке данных: ${error}`, 'Close');
+          console.log(`Ошибка при загрузке данных: ${error}`);
         }
       );
   }
@@ -155,7 +156,8 @@ export class DashboardComponent {
             this.cdr.detectChanges();
           },
           (error) => {
-            this.OpenSnackBar(`Ошибка при проверке статуса: ${error.message}`, 'Close');
+            //this.OpenSnackBar(`Ошибка при проверке статуса: ${error.message}`, 'Close');
+            console.log(`Ошибка при проверке статуса: ${error.message}`);
           }
         );
     }

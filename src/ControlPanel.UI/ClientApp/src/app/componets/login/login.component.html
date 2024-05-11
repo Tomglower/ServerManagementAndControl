@@ -1,47 +1,10 @@
-<!--
-<div class="outer">
-    <div class="container">
-        <div class="row">
-            <div class="offser-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3">
-                <div class="panel border bg-white">
-                    <div class="panel-heading">
-                        <h3 class="pt-3 font-weight-bold">Login</h3>
-                    </div>
-                    <div class="panel-body p-3">
-                        <form [formGroup]="loginForm">
-                            <div class="form-group pt-3">
-                                <div class="input-field" [class.error] = "loginForm.controls['username'].dirty && loginForm.hasError('required','username')">
-                                    <span class="fa fa-user p-2"></span>
-                                    <input formControlName="username" type="text" placeholder="Username">
-                                </div>
-                            </div>
-                            <small *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')" class="text-danger">*Username is required</small>
-                            <div class="form-group pt-3">
-                                <div class="input-field" [class.error] = "loginForm.controls['password'].dirty && loginForm.hasError('required','password')">
-                                    <span class="fa fa-lock p-2"></span>
-                                    <input formControlName="password" [type]="type" placeholder="Password">
-                                    <span (click)="hideShowPass()" class="fa {{eyeIcon}}"></span>
-                                </div>
-                            </div>
-                            <small *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')" class="text-danger">*Password is required</small>
-
-                            <button (click) ="onLogin()" class = "btn btn-primary btn-block mt-4 w-100">Login</button>
-                            <div class="text-center pt-4 text-muted">Register <a id="forget" routerLink="/signup">Sign Up</a></div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- </div>
-  --->
 <div class="outer">
   <div class="container">
     <div class="row">
       <div class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3">
         <mat-card>
           <mat-card-header>
-            <mat-card-title>Login</mat-card-title>
+            <mat-card-title>Вход</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <form [formGroup]="loginForm">
@@ -49,7 +12,7 @@
                 <mat-label>Username</mat-label>
                 <input matInput formControlName="username" placeholder="Username" />
                 <mat-error *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">
-                  *Username is required
+                  *Поле username обязательно
                 </mat-error>
               </mat-form-field>
               <mat-form-field appearance="outline" class="w-100">
@@ -60,12 +23,12 @@
                   </button>
 
                 <mat-error *ngIf="loginForm.controls['password'].dirty  && loginForm.hasError('required','password')">
-                  *Password is required
+                  *Поле password обязательно
                 </mat-error>
               </mat-form-field>
 
-              <button mat-raised-button color="primary" (click)="onLogin()" class="w-100">Login</button>
-              <p class="text-center pt-4 text-muted">Register <a id="forget" routerLink="/signup">Sign Up</a></p>
+              <button mat-raised-button color="primary" (click)="onLogin()" class="w-100">Войти</button>
+              <p class="text-center pt-4 text-muted"><a id="forget" routerLink="/signup">Регистрация</a></p>
             </form>
           </mat-card-content>
         </mat-card>
