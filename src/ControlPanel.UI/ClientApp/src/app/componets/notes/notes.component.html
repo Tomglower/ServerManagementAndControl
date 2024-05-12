@@ -16,7 +16,7 @@
       <h3>Список заметок</h3>
       <div class="list-group">
         <!-- Здесь будет список заметок -->
-        <div *ngFor="let note of notes" class="list-group-item list-group-item-action">
+        <div *ngFor="let note of notes" class="list-group-item list-group-item-action" (click)="selectNote(note)">
           <span>{{ note.title }}</span>
           <button mat-icon-button color="warn" class="delete-button" (click)="deleteNote(note)">
             <i class="fa fa-trash"></i>
