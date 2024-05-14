@@ -89,11 +89,6 @@ public class TelegramBotBackgroundService : BackgroundService
                         cancellationToken: cancellationToken);
                 }
             }
-            else
-            {
-                await botClient.SendTextMessageAsync(chatId, "Пожалуйста, отправьте валидный IP адрес.",
-                    cancellationToken: cancellationToken);
-            }
             if (messageText.StartsWith("/getserver"))
             {
                 var userId = "1"; 
@@ -119,6 +114,13 @@ public class TelegramBotBackgroundService : BackgroundService
                     _logger.LogError(ex, "Ошибка при получении списка серверов.");
                     await botClient.SendTextMessageAsync(chatId, "Ошибка при получении списка серверов.", cancellationToken: cancellationToken);
                 }
+            }
+            if (messageText.StartsWith("/stop"))
+            {
+                // Останавливаем получение обновлений
+                await _botClient.CloseAsync(cancellationToken: cancellationToken);
+
+                await botClient.SendTextMessageAsync(chatId, "Получение обновлений остановлено.", cancellationToken: cancellationToken);
             }
             
            

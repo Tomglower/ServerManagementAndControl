@@ -1,5 +1,5 @@
 <mat-toolbar color="primary">
-  <span>ServerManagerAndControl</span>
+  <span>ServerManagementAndControl</span>
   <span class="spacer"></span>
   <a routerLink="/dashboard">Дэшборд</a>
   <span class="spacer"></span>
@@ -42,7 +42,7 @@
             </button>
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="deleteMachine(machine); $event.stopPropagation()">Удалить</button>
-              <button mat-menu-item (click)="openMachineServer(machine.link); $event.stopPropagation()">Открыть сервер</button>
+              <button mat-menu-item (click)="openMachineServer(machine.link); $event.stopPropagation()">Prometheus</button>
             </mat-menu>
           </mat-list-item>
         </mat-list>
