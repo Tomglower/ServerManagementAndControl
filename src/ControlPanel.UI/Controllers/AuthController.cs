@@ -83,7 +83,7 @@ namespace ControlPanel.UI.Controllers
                 {
                     _logger.LogInformation("Registration successful for user: {UserName}", user.UserName);
 
-                    return Ok(new { Message = "User registered!" });
+                    return Ok(new { Message = "Пользователь зарегистрирован" });
                 }
                 else
                 {

@@ -35,7 +35,7 @@ export class DashboardComponent {
   customMetricName = '';
   customMetricQuery = '';
   customMetrics: CustomMetric[] = [];
-
+  metricForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -48,7 +48,13 @@ export class DashboardComponent {
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
 
-  ) { }
+  ) {
+    this.metricForm = this.fb.group({
+      metricName: ['', Validators.required],
+      metricQuery: ['', Validators.required],
+      metricIcon: [''] // Добавлено новое поле для иконки
+    });
+  }
 
   ngOnInit(): void {
     this.auth.autoLogin();
@@ -279,6 +285,7 @@ export class DashboardComponent {
         query: this.customMetricQuery,
         machineId: this.selectedMachine.id,
         value: null,
+        icon: this.metricForm.value.metricIcon // Получаем выбранную иконку из формы
       };
 
       this.customMetrics.push(newMetric);
@@ -288,6 +295,7 @@ export class DashboardComponent {
       this.refreshCustomMetrics(); // сразу обновить значения метрик
     }
   }
+
 
   removeCustomMetric(metricId: string): void {
     this.customMetrics = this.customMetrics.filter(metric => metric.id !== metricId);
@@ -348,6 +356,7 @@ export class DashboardComponent {
           query: result.metricQuery,
           machineId: this.selectedMachine.id,
           value: null,
+          icon: result.metricIcon // добавляем значок метрики
         };
 
         this.customMetrics.push(newMetric);

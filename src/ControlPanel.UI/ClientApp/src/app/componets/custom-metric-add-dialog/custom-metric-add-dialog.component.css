@@ -1,0 +1,5 @@
+.dialog-card {
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden; /* Добавляем скрытие полосы прокрутки */
+}

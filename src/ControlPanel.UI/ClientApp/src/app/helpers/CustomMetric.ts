@@ -4,4 +4,5 @@ export default interface CustomMetric {
   query: string;
   machineId: number;
   value: number | null;
+  icon: string | null;
 }

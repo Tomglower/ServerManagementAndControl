@@ -10,6 +10,18 @@ import {CustomMetricDialogComponent} from "../custom-metric-dialog/custom-metric
 })
 export class CustomMetricAddDialogComponent {
   metricForm: FormGroup;
+  metricIcons = [
+    { value: 'dashboard', label: 'Панель управления' },
+    { value: 'cached', label: 'Загрузка' },
+    { value: 'developer_board', label: 'Панель' },
+    { value: 'memory', label: 'Память' },
+    { value: 'sd_storage', label: 'Хранилище' },
+    { value: 'analytics', label: 'Аналитика' },
+    { value: 'monitor', label: 'Мониторинг' },
+    { value: 'report', label: 'Отчет' },
+    { value: 'api', label: 'API' }
+  ]
+
 
   constructor(
     public dialogRef: MatDialogRef<CustomMetricDialogComponent>,
@@ -19,13 +31,14 @@ export class CustomMetricAddDialogComponent {
     this.metricForm = this.fb.group({
       metricName: ['', Validators.required],
       metricQuery: ['', Validators.required],
+      metricIcon: [''] // Добавлено новое поле для иконки
     });
   }
 
   onAddMetric() {
     if (this.metricForm.valid) {
-      const { metricName, metricQuery } = this.metricForm.value;
-      this.dialogRef.close({ metricName, metricQuery });
+      const { metricName, metricQuery, metricIcon } = this.metricForm.value;
+      this.dialogRef.close({ metricName, metricQuery, metricIcon });
     }
   }
 

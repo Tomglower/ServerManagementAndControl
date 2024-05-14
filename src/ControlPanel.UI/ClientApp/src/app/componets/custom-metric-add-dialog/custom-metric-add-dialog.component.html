@@ -21,6 +21,15 @@
         Запрос метрики обязателен
       </mat-error>
     </mat-form-field>
+    <mat-form-field class="full-width" style="width: 100%;">
+      <mat-label>Иконка метрики</mat-label>
+      <mat-select formControlName="metricIcon">
+        <mat-option *ngFor="let icon of metricIcons" [value]="icon.value">
+          <mat-icon>{{ icon.value }}</mat-icon>
+          {{ icon.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <!-- Кнопки диалога -->
     <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
